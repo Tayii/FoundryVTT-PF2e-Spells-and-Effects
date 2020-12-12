@@ -84,7 +84,7 @@ export default class TayiWPSpellLayOnHands {
             case 'undead':
                 effectDesc = "-" + spellParams.ac_penalty + effectDesc;
         }
-        await TayiWP.postChatButton(spellParams.fullName, effectDesc, spellParams);
+        await TayiWP.postChatButtonEffect(spellParams.fullName, effectDesc, spellParams);
     }
 
     static async applyFunc(spellParams) {

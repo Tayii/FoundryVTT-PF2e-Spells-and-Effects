@@ -112,14 +112,14 @@ export default class TayiWPFeatTreatWounds {
     static async useFunc(featParams) {
         const actor = TayiWP.ifActor();
         const actionDC = parseInt(featParams.dc);
-        const roll = new TayiWPRoll("d20 + @total").rollDC({total: featParams.skill.totalModifier}, actionDC);
+        const roll = new TayiWPRoll("d20 + @total").roll({total: featParams.skill.totalModifier}).vsDC(actionDC);
         const messageContent = 'proficiency level <b>' + featParams.level + '</b>, DC <b>' + actionDC + '</b>: '
             + roll.toString();
         await TayiWP.saySomething(actor, featParams.fullName + ': ' + messageContent);
         if (!featParams.setGrade(roll.grade)) {
             return;
         }
-        const roll2 = new TayiWPRoll(featParams.formula).roll();
+        const roll2 = new TayiWPRoll(featParams.formula).roll({});
         await TayiWP.forEachTargetedToken(async (owner_actor, target_actor, target_token, featParams) => {
             const messageContent = 'target <b>' + target_token.data.name + '</b> got <b>' + featParams.formula
                 + '</b> ' + featParams.meaning;

@@ -29,6 +29,29 @@ export default class TayiWP {
         });
     }
 
+    static callbackGradeEffect(message, html, data, chatCard, tayiWPdata) {
+        const funcArgs = tayiWPdata['funcArgs'];
+        const applyFunc = tayiWPdata['applyFunc'];
+        for (let gradeLevel in funcArgs.grades) {
+            if (!funcArgs.grades.hasOwnProperty(gradeLevel)) {
+                continue;
+            }
+            const btn = $(`<button>Apply ` + TayiWPConst.GRADE_NAMES[gradeLevel] + `</button>`);
+            chatCard.find('[data-grade="' + gradeLevel + '"]').after(btn);
+            btn.click(async ev => {
+                ev.stopPropagation();
+                await applyFunc(funcArgs, gradeLevel);
+            });
+        }
+        const btn2 = $(`<button>Remove effect</button>`);
+        const removeFunc = tayiWPdata['removeFunc'];
+        chatCard.append(btn2);
+        btn2.click(async ev => {
+            ev.stopPropagation();
+            await removeFunc(funcArgs);
+        });
+    }
+
     static callbackSpellEffect(message, html, data, chatCard, tayiWPdata) {
         const btn = $(`<button>Apply effect</button>`);
         const btn2 = $(`<button>Remove effect</button>`);
@@ -264,7 +287,7 @@ export default class TayiWP {
         // await new TurnAlertConfig(alertData).render(true);
     }
 
-    static async postChatButton(effectName, effectDesc, funcArgs) {
+    static async postChatButtonEffect(effectName, effectDesc, funcArgs) {
         const actor = TayiWP.ifActor();
         let speaker = { actor: actor, alias: actor.name };
         if (funcArgs['EXPIRED']) {
@@ -276,6 +299,33 @@ export default class TayiWP {
             speaker: speaker,
             content: '<div class="' + TayiWP.CHAT_CARD_CLASS + '"><b>' + effectName + '</b><p>' + effectDesc
             + '</p></div>',
+            flags: {}
+            // type: CONST.CHAT_MESSAGE_TYPES.OOC
+        };
+        chatData.flags[TayiWP.CHAT_DATA_NAME] = funcArgs;
+        await ChatMessage.create(chatData, {});
+    }
+
+    static async postChatButtonGrade(effectName, effectDescFunc, funcArgs) {
+        const actor = TayiWP.ifActor();
+        let speaker = { actor: actor, alias: actor.name };
+        let effectDescAdd = '';
+        if (funcArgs['EXPIRED']) {
+            speaker = { alias: "Turn Alert" };
+            effectDescAdd += ' EXPIRED';
+        }
+        let messageContent = '<div class="' + TayiWP.CHAT_CARD_CLASS + '"><b>' + effectName + '</b>';
+        for (let gradeLevel in funcArgs.grades) {
+            if (!funcArgs.grades.hasOwnProperty(gradeLevel)) {
+                continue;
+            }
+            messageContent += '<p data-grade="' + gradeLevel + '">'
+                + effectDescFunc(funcArgs, gradeLevel) + effectDescAdd + '</p>';
+        }
+        const chatData = {
+            user: game.user._id,
+            speaker: speaker,
+            content: messageContent + '</div>',
             flags: {}
             // type: CONST.CHAT_MESSAGE_TYPES.OOC
         };

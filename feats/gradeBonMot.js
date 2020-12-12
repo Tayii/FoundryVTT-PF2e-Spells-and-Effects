@@ -96,15 +96,19 @@ export default class TayiWPGradeBonMot {
 
     static async useFunc(featParams) {
         const actor = TayiWP.ifActor();
-        // TODO target will DC
-        const targetDC = 0;
-        const roll = new TayiWPRoll("d20 + @total").rollDC({total: featParams.skill.totalModifier}, targetDC);
-        const messageContent = 'proficiency level <b>' + featParams.level + '</b>, Will DC <b>' + targetDC + '</b>: '
-            + roll.toString();
+        const x = {
+            'feat': featParams,
+            'roll': new TayiWPRoll("d20 + @total").roll({total: featParams.skill.totalModifier})
+        };
+        const messageContent = 'proficiency level <b>' + featParams.level + '</b>, rolled ' + x.roll.toString();
         await TayiWP.saySomething(actor, featParams.fullName + ': ' + messageContent);
-        if (!featParams.setGrade(roll.grade)) {
-            return;
-        }
+        await TayiWP.forEachTargetedToken(async (owner_actor, target_actor, target_token, params) => {
+            const targetDC = target_actor.data.data.saves.will.totalModifier + 10;
+            const roll = params.roll.vsDC(targetDC);
+            const featParams = params.feat;
+            const messageContent = 'target - ' + target_token.data.name + ', ' + roll.toString();
+            await TayiWP.saySomething(owner_actor, featParams.macroName + ': ' + messageContent);
+        }, x);
         await TayiWPGradeBonMot.createEffectButton(featParams);
         featParams['EXPIRED'] = true;
         await TayiWP.whenNextTurn(TayiWPConst.COMBAT_TRIGGERS.TURN_START, actor.data, 10, featParams.macroName,
@@ -112,32 +116,30 @@ export default class TayiWPGradeBonMot {
     }
 
     static async createEffectButton(featParams) {
-        const effectDesc = '-' + featParams.penalty + ' status penalty to Perception and Will saves, 10 rounds (1 minute)'
-            + ', target = ' + featParams.target;
-        await TayiWP.postChatButton(featParams.fullName, effectDesc, featParams);
+        await TayiWP.postChatButtonGrade(featParams.fullName, (featParams, gradeLevel) => {
+            const penalty = featParams['penalty_' + gradeLevel];
+            return '-' + penalty + ' status penalty to Perception and Will saves, 10 rounds (1 minute)'
+        }, featParams);
     }
 
-    static async applyFunc(featParams) {
+    static async applyFunc(featParams, gradeLevel) {
         await TayiWP.forEachControlledToken(async (actor, token, featParams) => {
-            const messageContent = 'takes' + featParams.penalty + ' status penalty to Perception and Will saves,'
+            const penalty = parseInt(featParams['penalty_' + gradeLevel]);
+            const messageContent = 'takes -' + penalty + ' status penalty to Perception and Will saves,'
                 + ' 10 rounds (1 minute)';
-            // TODO will modifier
-            actor.addCustomModifier('will', featParams.CALLBACK_NAME, featParams.penalty, 'status');
-            // TODO perception modifier
-            actor.addCustomModifier('perception', featParams.CALLBACK_NAME, featParams.penalty, 'status');
+            actor.addCustomModifier('will', featParams.CALLBACK_NAME, penalty, 'status');
+            actor.addCustomModifier('perception', featParams.CALLBACK_NAME, penalty, 'status');
             await TayiWP.saySomething(actor, featParams.macroName + ': ' + messageContent);
         }, featParams);
     }
 
-    static async removeFunc(spellParams) {
+    static async removeFunc(featParams) {
         await TayiWP.forEachControlledToken(async (actor, token, featParams) => {
-            const messageContent = 'loses' + featParams.penalty + ' status penalty to Perception and Will saves';
-            // TODO will modifier
+            const messageContent = 'loses status penalty to Perception and Will saves';
             actor.removeCustomModifier('will', featParams.CALLBACK_NAME);
-            // TODO perception modifier
             actor.removeCustomModifier('perception', featParams.CALLBACK_NAME);
             await TayiWP.saySomething(actor, featParams.macroName + ': ' + messageContent);
-        }, spellParams);
+        }, featParams);
     }
 
     static init(args) {
@@ -148,7 +150,7 @@ export default class TayiWPGradeBonMot {
 
     static getCallback(funcArgs) {
         return {
-            callback: TayiWP.callbackSpellEffect,
+            callback: TayiWP.callbackGradeEffect,
             callbackArgs: {
                 applyFunc: this.applyFunc,
                 removeFunc: this.removeFunc,
