@@ -8,5 +8,6 @@
   "esmodules": [
     "index.js"
   ],
-  "manifest": "https://raw.githubusercontent.com/Tayii/FoundryVTT-PF2e-Spells-and-Effects/main/module.json"
+  "manifest": "https://raw.githubusercontent.com/Tayii/FoundryVTT-PF2e-Spells-and-Effects/main/module.json",
+  "download": "https://github.com/Tayii/FoundryVTT-PF2e-Spells-and-Effects/archive/main.zip"
 }
