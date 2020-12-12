@@ -2,10 +2,11 @@
   "name": "tayiwp-pf2e",
   "title": "TayiWP - PF2e Spells and Effects",
   "description": "Adds active effects to spells",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "Tayi",
   "minimumCoreVersion": "0.6.0",
   "esmodules": [
     "index.js"
-  ]
+  ],
+  "manifest": "https://raw.githubusercontent.com/Tayii/FoundryVTT-PF2e-Spells-and-Effects/main/module.json"
 }
