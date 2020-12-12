@@ -53,6 +53,7 @@ export default class TayiWPSpellLayOnHands {
     };
 
     static async castFunc(spellParams) {
+        // нельзя использовать this, т.к. вызывается из класса TayiWPSpell
         const actor = TayiWP.ifActor();
         // let messageContent = '';
         await TayiWPSpell.findActorItem(spellParams.CALLBACK_NAME + ' (' + spellParams.spell_target + ')').roll();
@@ -68,7 +69,7 @@ export default class TayiWPSpellLayOnHands {
             // messageContent = "damage = <b>[[" + roll.roll.result + "]]</b>";
         }
         // await TayiWP.saySomething(spellParams.getSpellName() + ': ' + messageContent);
-        await this.createEffectButton(spellParams);
+        await TayiWPSpellLayOnHands.createEffectButton(spellParams);
         spellParams['EXPIRED'] = true;
         await TayiWP.whenNextTurn(TayiWPConst.COMBAT_TRIGGERS.TURN_START, actor.data, 1, spellParams.macroName,
             [spellParams]);

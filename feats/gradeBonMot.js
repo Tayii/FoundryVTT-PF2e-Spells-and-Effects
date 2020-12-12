@@ -105,7 +105,7 @@ export default class TayiWPGradeBonMot {
         if (!featParams.setGrade(roll.grade)) {
             return;
         }
-        await this.createEffectButton(featParams);
+        await TayiWPGradeBonMot.createEffectButton(featParams);
         featParams['EXPIRED'] = true;
         await TayiWP.whenNextTurn(TayiWPConst.COMBAT_TRIGGERS.TURN_START, actor.data, 10, featParams.macroName,
             [featParams]);

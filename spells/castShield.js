@@ -47,7 +47,7 @@ export default class TayiWPSpellShield {
         }
         spellParams.ac_bonus = parseInt(spellParams.ac_bonus);
         spellParams.hardness = parseInt(spellParams.hardness);
-        await this.applyFunc(spellParams);
+        await TayiWPSpellShield.applyFunc(spellParams);
         await TayiWP.whenNextTurn(TayiWPConst.COMBAT_TRIGGERS.TURN_START, actor.data, 1, spellParams.macroName,
             [spellParams]);
     }
