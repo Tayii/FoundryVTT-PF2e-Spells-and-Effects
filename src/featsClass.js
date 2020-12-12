@@ -13,7 +13,7 @@ export default class TayiWPFeat extends TayiWPBaseClass {
         if (this.checkRankReqs(skill, levels) < 0) {
             return false;
         }
-        return new TayiWPFeat(name, skill, levels, callbackFunc);
+        return new this(name, skill, levels, callbackFunc);
     }
 
     constructor(name, skill, levels, callbackFunc) {

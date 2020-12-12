@@ -10,14 +10,14 @@ export default class TayiWPSpell extends TayiWPBaseClass {
         if (!this.findActorItem(name)) {
             return false;
         }
-        return new TayiWPSpell(name, levels, callbackFunc);
+        return new this(name, levels, callbackFunc);
     }
 
     constructor(name, levels, callbackFunc) {
         super(name, levels, callbackFunc);
         const charLevel = TayiWP.ifActor().data.data.details.level.value;
         for (let i = 1; i <= Math.ceil(charLevel / 2); i += 1) {
-            if (!spellLevels.hasOwnProperty(i)) {
+            if (!levels.hasOwnProperty(i)) {
                 continue;
             }
             this.dialogLevelMax = i;
