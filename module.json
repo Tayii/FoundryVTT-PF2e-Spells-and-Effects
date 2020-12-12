@@ -1,0 +1,11 @@
+{
+  "name": "tayiwp-pf2e",
+  "title": "TayiWP - PF2e Spells and Effects",
+  "description": "Adds active effects to spells",
+  "version": "1.0.2",
+  "author": "Tayi",
+  "minimumCoreVersion": "0.6.0",
+  "esmodules": [
+    "index.js"
+  ]
+}
