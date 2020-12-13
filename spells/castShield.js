@@ -66,14 +66,12 @@ export default class TayiWPSpellShield {
         const shield = await actor.createOwnedItem(item.data);
         actor.updateEmbeddedEntity("OwnedItem", [{
             "_id": shield._id,
+            "data.hp.value": 1,
+            "data.maxHp.value": 1,
             "data.armor.value": spellParams.ac_bonus,
             "data.hardness.value": spellParams.hardness,
-            "name": spellParams.shieldName + " (lvl " + spellParams.level + ")"
-        }]);
-        actor.updateEmbeddedEntity("OwnedItem", [{
-            "_id": shield._id,
+            "name": spellParams.shieldName + " (lvl " + spellParams.level + ")",
             "data.equipped.value": true,
-            "data.hp.value": shield.data.maxHp.value,
         }]);
         actor.addCustomModifier('ac', 'Raise Shield (' + spellParams.shieldName + ')', spellParams.ac_bonus, 'circumstance');
         token.toggleEffect("systems/pf2e/icons/conditions-2/status_acup.png", {

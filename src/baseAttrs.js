@@ -4,6 +4,7 @@ export default class TayiWPAttributes {
     level = 0;
 
     constructor() {
+        this.CALLBACK_TYPE = this.getClass().CALLBACK_TYPE;
         this.CALLBACK_NAME = this.getClass().CALLBACK_NAME;
     }
 

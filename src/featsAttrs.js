@@ -24,4 +24,9 @@ export class TayiWPFeatAttributes extends TayiWPAttributes {
     getFullName() {
         return this.getMacroName() + ' ( ' + this.skillName + ' )'
     }
+
+    copy(x) {
+        x.skill = this.skill;
+        return x;
+    }
 }

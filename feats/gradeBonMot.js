@@ -52,7 +52,7 @@ class FeatAttributes extends TayiWPFeatAttributes {
     }
 
     copy() {
-        return new FeatAttributes(this.grades);
+        return super.copy(new FeatAttributes(this.grades));
     }
 }
 

@@ -15,7 +15,7 @@ export default class TayiWP {
                 return;
             }
             const funcArgs = flags[TayiWP.CHAT_DATA_NAME];
-            const myData = TayiWP[funcArgs.getClass().CALLBACK_TYPE + '_CALLBACKS'][funcArgs.CALLBACK_NAME]
+            const myData = TayiWP[funcArgs.CALLBACK_TYPE + '_CALLBACKS'][funcArgs.CALLBACK_NAME]
                 .getCallback(funcArgs);
             myData['callback'](message, html, data, chatCard, myData['callbackArgs']);
         });
