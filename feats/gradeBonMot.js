@@ -96,9 +96,10 @@ export default class TayiWPGradeBonMot {
 
     static async useFunc(featParams) {
         const actor = TayiWP.ifActor();
+        const skill = actor.data.data.skills.find(e => e.name === featParams.skillName);
         const x = {
             'feat': featParams,
-            'roll': new TayiWPRoll("d20 + @total").roll({total: featParams.skill.totalModifier})
+            'roll': new TayiWPRoll("d20 + @total").roll({total: skill.totalModifier})
         };
         const messageContent = 'proficiency level <b>' + featParams.level + '</b>, rolled ' + x.roll.toString();
         await TayiWP.saySomething(actor, featParams.fullName + ': ' + messageContent);

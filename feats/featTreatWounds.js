@@ -112,7 +112,8 @@ export default class TayiWPFeatTreatWounds {
     static async useFunc(featParams) {
         const actor = TayiWP.ifActor();
         const actionDC = parseInt(featParams.dc);
-        const roll = new TayiWPRoll("d20 + @total").roll({total: featParams.skill.totalModifier}).vsDC(actionDC);
+        const skill = actor.data.data.skills.find(e => e.name === featParams.skillName);
+        const roll = new TayiWPRoll("d20 + @total").roll({total: skill.totalModifier}).vsDC(actionDC);
         const messageContent = 'proficiency level <b>' + featParams.level + '</b>, DC <b>' + actionDC + '</b>: '
             + roll.toString();
         await TayiWP.saySomething(actor, featParams.fullName + ': ' + messageContent);
