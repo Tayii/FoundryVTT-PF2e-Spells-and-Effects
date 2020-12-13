@@ -8,6 +8,7 @@ const name = 'Shield';
 class SpellAttributes extends TayiWPSpellAttributes {
     static CALLBACK_NAME = name;
     level = 1;
+    compendiumName = 'pf2e.equipment-srd';
     shieldNameBefore = 'Buckler';
     shieldName = 'Magical Shield of Force';
 
@@ -58,22 +59,17 @@ export default class TayiWPSpellShield {
             return;
         }
         const token = TayiWP.ifToken();
-
-        let shield;
-        for (const p of game.folders.filter(p => p.type === 'Item')) {
-            const action = p.content.find(a => a.data.name === spellParams.shieldNameBefore);
-            if (!action) {
-                continue;
-            }
-            shield = await actor.createOwnedItem(action.data);
-            actor.updateEmbeddedEntity("OwnedItem", [{
-                "_id": shield._id,
-                "data.armor.value": spellParams.ac_bonus,
-                "data.hardness.value": spellParams.hardness,
-                "name": spellParams.shieldName + " (lvl " + spellParams.spellLevel + ")"
-            }]);
-            break;
-        }
+        const pack = game.packs.get(spellParams.compendiumName);
+        const index = await pack.getIndex();
+        const entry = index.find(e => e.name === spellParams.shieldNameBefore);
+        const item = await pack.getEntity(entry._id);
+        const shield = await actor.createOwnedItem(item.data);
+        actor.updateEmbeddedEntity("OwnedItem", [{
+            "_id": shield._id,
+            "data.armor.value": spellParams.ac_bonus,
+            "data.hardness.value": spellParams.hardness,
+            "name": spellParams.shieldName + " (lvl " + spellParams.level + ")"
+        }]);
         actor.updateEmbeddedEntity("OwnedItem", [{
             "_id": shield._id,
             "data.equipped.value": true,
@@ -120,4 +116,3 @@ export default class TayiWPSpellShield {
         }
     }
 }
-

@@ -43,10 +43,7 @@ export default class TayiWPFeat extends TayiWPBaseClass {
                 rankMax = i;
             }
         }
-        if (rankMax >= 0) {
-            return rankMax;
-        }
-        return false;
+        return rankMax;
     }
 
     checkRankReqs() {
