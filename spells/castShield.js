@@ -64,7 +64,7 @@ export default class TayiWPSpellShield {
         const entry = index.find(e => e.name === spellParams.shieldNameBefore);
         const item = await pack.getEntity(entry._id);
         const shield = await actor.createOwnedItem(item.data);
-        actor.updateEmbeddedEntity("OwnedItem", [{
+        await actor.updateEmbeddedEntity("OwnedItem", [{
             "_id": shield._id,
             "data.hp.value": 1,
             "data.maxHp.value": 1,
@@ -73,7 +73,7 @@ export default class TayiWPSpellShield {
             "name": spellParams.shieldName + " (lvl " + spellParams.level + ")",
             "data.equipped.value": true,
         }]);
-        actor.addCustomModifier('ac', 'Raise Shield (' + spellParams.shieldName + ')', spellParams.ac_bonus, 'circumstance');
+        await actor.addCustomModifier('ac', 'Raise Shield (' + spellParams.shieldName + ')', spellParams.ac_bonus, 'circumstance');
         token.toggleEffect("systems/pf2e/icons/conditions-2/status_acup.png", {
             "active": true
         });
@@ -93,7 +93,7 @@ export default class TayiWPSpellShield {
             .filter(armor => armor.data.armorType.value === 'shield')
             .find(shield => shield.name.startsWith(spellParams.shieldName));
 
-        actor.removeCustomModifier('ac', 'Raise Shield (' + spellParams.shieldName + ')');
+        await actor.removeCustomModifier('ac', 'Raise Shield (' + spellParams.shieldName + ')');
         token.toggleEffect("systems/pf2e/icons/conditions-2/status_acup.png", {
             "active": false
         });
@@ -101,7 +101,7 @@ export default class TayiWPSpellShield {
         if (shield.data.hp.value < shield.data.maxHp.value) {
             messageContent += "; " + spellParams.CALLBACK_NAME + " can't be used for 10 minutes"
         }
-        actor.deleteEmbeddedEntity('OwnedItem', shield._id);
+        await actor.deleteEmbeddedEntity('OwnedItem', shield._id);
         await TayiWP.saySomething(actor, spellParams.macroName + ': ' + messageContent);
     }
 
