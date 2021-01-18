@@ -157,6 +157,7 @@ export default class TayiWPHandlerClass {
                     if (dialogParamsAfter['show-info'] === 'yes') {
                         await this.getClass().findActorItem(this.getClass().SUBCLASS_NAME).roll(event);
                     }
+                    dialogParamsAfter.source_actor_id = TayiWPConst.ifActor()._id;
                     dialogParamsAfter.SUBCLASS_NAME = this.getClass().SUBCLASS_NAME;
                     dialogParamsAfter.HANDLER_NAME = this.getClass().getHandlerName();
                     dialogParamsAfter.MACRO_NAME = this.getClass().getMacroName();

@@ -94,21 +94,21 @@ export default class TayiWP {
         await ChatMessage.create(chatData, {});
     }
 
-    static async whenNextTurn(triggerWhen, combatantData, duration, macroName, argsArray) {
+    static async whenNextTurn(triggerWhen, combatantDataId, duration, macroName, argsArray) {
         const combatCurrent = TayiWPConst.ifCombat();
         if (!combatCurrent) {
             // saySomething(triggerWhen + combatantData.name + ": " + await textFunc());
             return;
         }
 
-        const combatantTurnIndex = combatCurrent.turns.findIndex(turn => turn.actor.data._id === combatantData._id);
+        const combatantTurnIndex = combatCurrent.turns.findIndex(turn => turn.actor.data._id === combatantDataId);
         const combatantTurnId = combatCurrent.turns[combatantTurnIndex]._id;
         const currentTurnIndex = combatCurrent.data.turn;
         const roundNumber = currentTurnIndex < combatantTurnIndex ? 0 : 1;
 
         const alertData = {
             id: null,
-            name: TayiWPConst.CHAT_DATA_NAME + "Alert" + triggerWhen + combatantData._id + macroName,
+            name: TayiWPConst.CHAT_DATA_NAME + "Alert" + triggerWhen + combatantDataId + macroName,
             combatId: combatCurrent.data._id,
             createdRound: combatCurrent.data.round,
             round: roundNumber,
@@ -120,7 +120,7 @@ export default class TayiWP {
                 expire: duration,
                 expireAbsolute: false
             } : null,
-            label: TayiWPConst.CHAT_DATA_NAME + "Alert" + triggerWhen + combatantData._id + macroName,
+            label: TayiWPConst.CHAT_DATA_NAME + "Alert" + triggerWhen + combatantDataId + macroName,
             message: null,
             recipientIds: [],
             macro: macroName,

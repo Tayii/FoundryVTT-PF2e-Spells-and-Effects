@@ -2,6 +2,7 @@ import TayiWPConst from "../../src/const.js";
 import TayiWPSpell from "../../categories/clSpell.js";
 import TayiWPSpellLevel from "../../categories/clSpellLevel.js";
 import TayiWP from "../../src/base.js";
+import TayiWPFlagsClass from "../../src/clFlags.js";
 
 class TayiWPSpellAttributesShield extends TayiWPSpellLevel {
     compendiumName = 'pf2e.equipment-srd';
@@ -48,22 +49,22 @@ export default class TayiWPSpellShield extends TayiWPSpell {
         const actor = TayiWPConst.ifActor();
         await this.applyEffect(spellParams);
         spellParams['EXPIRED'] = true;
-        await TayiWP.whenNextTurn(TayiWPConst.COMBAT_TRIGGERS.TURN_START, actor.data, 1, spellParams.MACRO_NAME,
+        await TayiWP.whenNextTurn(TayiWPConst.COMBAT_TRIGGERS.TURN_START, actor.data._id, 1, spellParams.MACRO_NAME,
             [spellParams]);
     }
 
-    async createEffectButton(spellParams) {
-        const effectDesc = `+${spellParams.ac_bonus} circumstance AC, 1 round (hardness ${spellParams.hardness})`;
-        await TayiWP.postChatButtonEffect(this.getFullName(spellParams.level), effectDesc, spellParams);
-    }
+    // async createEffectButton(spellParams) {
+    //     const effectDesc = `+${spellParams.ac_bonus} circumstance AC, 1 round (hardness ${spellParams.hardness})`;
+    //     await TayiWP.postChatButtonEffect(this.getFullName(spellParams.level), effectDesc, spellParams);
+    // }
 
-    static getCallbackMessage() {
-        return this;
-    }
+    // static getCallbackMessage() {
+        // return this;
+    // }
 
-    static handleMessage(message, html, data, chat_card, effect_data) {
-        TayiWPConst.createButton(chat_card, "Remove effect", this.buttonClickRemoveEffect, effect_data);
-    }
+    // static handleMessage(message, html, data, chat_card, effect_data) {
+        // TayiWPConst.createButton(chat_card, "Remove effect", this.buttonClickRemoveEffect, effect_data);
+    // }
 
     async applyEffect(spellParams) {
         spellParams.ac_bonus = parseInt(spellParams.ac_bonus);
@@ -88,16 +89,17 @@ export default class TayiWPSpellShield extends TayiWPSpell {
             token.toggleEffect("systems/pf2e/icons/conditions-2/status_acup.png", {
                 "active": true
             });
-            spellParams.affect(token);
-            const messageContent = 'creates shield with AC <b>' + spellParams.ac_bonus
-                + '</b> and Hardness <b>' + spellParams.hardness + '</b>';
-            await TayiWPConst.saySomething(actor, spellParams.MACRO_NAME + ': ' + messageContent);
+            TayiWPFlagsClass.affect(spellParams, actor, token);
+            const messageContent = `creates shield with AC <b>${spellParams.ac_bonus}`
+                + `</b> and Hardness <b>${spellParams.hardness}</b>`;
+            await TayiWPConst.saySomething(actor, `${spellParams.MACRO_NAME}: ${messageContent}`);
         }, spellParams);
     }
 
     async removeEffect(spellParams) {
         await TayiWPConst.forEachAffectedToken(async (current_actor, actor, token, spellParams) => {
-            let shield = actor.data.items.filter(item => item.type === 'armor')
+            let shield = actor.data.items
+                .filter(item => item.type === 'armor')
                 .filter(armor => armor.data.armorType.value === 'shield')
                 .find(shield => shield.name.startsWith(spellParams.shieldName));
 
@@ -110,6 +112,7 @@ export default class TayiWPSpellShield extends TayiWPSpell {
                 messageContent += `; ${spellParams.SUBCLASS_NAME} can't be used for 10 minutes`
             }
             await actor.deleteEmbeddedEntity('OwnedItem', shield._id);
+            TayiWPFlagsClass.remove(spellParams, actor, token);
             await TayiWPConst.saySomething(actor, `${spellParams.MACRO_NAME}: ${messageContent}`);
         }, spellParams);
     }
