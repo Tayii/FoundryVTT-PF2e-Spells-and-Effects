@@ -1,224 +1,101 @@
 import TayiWPConst from "./const.js";
 
 export default class TayiWP {
-    static CHAT_CARD_CLASS = "tayi-wp-macro";
-    static CHAT_DATA_NAME = "tayiwp";
-    // static CHAT_DATA_CALLBACK = "tayiwp_callback";
-    static SPELL_CALLBACKS = {};
-    static FEAT_CALLBACKS = {};
+    // callback_name (callback_type + name) => callback_class
+    //
+    // callback_class.getCallback(flag_args) => {
+    //  callback(message, html, data, chat_card, callback_args)
+    //  callback_args
+    // }
+    static HANDLERS_MESSAGE = {};
 
     static init() {
         Hooks.on('renderChatMessage', (message, html, data) => {
-            const chatCard = html.find("." + TayiWP.CHAT_CARD_CLASS);
+            // 1) определить, что сообщение нужно обработать
+            //  - если там есть карточка с названием нашего класса
+            //  - если есть флаг с нашим названием
+            const chat_card = html.find("." + TayiWPConst.CHAT_CARD_CLASS);
             const flags = data["message"]["flags"];
-            if (chatCard.length === 0 || !flags.hasOwnProperty(TayiWP.CHAT_DATA_NAME)) {
+            if (chat_card.length === 0 || !flags.hasOwnProperty(TayiWPConst.CHAT_DATA_NAME)) {
                 return;
             }
-            const funcArgs = flags[TayiWP.CHAT_DATA_NAME];
-            const myData = TayiWP[funcArgs.CALLBACK_TYPE + '_CALLBACKS'][funcArgs.CALLBACK_NAME]
-                .getCallback(funcArgs);
-            myData['callback'](message, html, data, chatCard, myData['callbackArgs']);
+            // 2) определить, каким обработчиком нужно обработать сообщение
+            //  - если название обработчика (TayiWPFlagsClass.HANDLER_NAME) есть
+            //      в списке обработчиков (HANDLERS_MESSAGE)
+            const effect_data = flags[TayiWPConst.CHAT_DATA_NAME];
+            if (!TayiWP.HANDLERS_MESSAGE.hasOwnProperty(effect_data.HANDLER_NAME)
+                || !TayiWP.HANDLERS_MESSAGE[effect_data.HANDLER_NAME]) {
+                return;
+            }
+            // 3) обработать сообщение
+            const handler_class = TayiWP.HANDLERS_MESSAGE[effect_data.HANDLER_NAME]; // обработчик
+            handler_class.handleMessage(message, html, data, chat_card, effect_data); // обрабатываем сообщение
         });
         Hooks.on('deleteCombat', (combat, options, userId) => {
             const alerts = TurnAlert.getAlerts(combat.id);
-            for (let alertId in alerts) {
-                if (!alerts.hasOwnProperty(alertId) || !alerts[alertId].name.startsWith(TayiWP.CHAT_DATA_NAME + "Alert")) {
+            for (const alert of alerts) {
+                if (!alert.name.startsWith(TayiWPConst.CHAT_DATA_NAME + "Alert")) {
                     continue;
                 }
-                TurnAlert.execute(alerts[alertId]);
+                TurnAlert.execute(alert);
             }
         });
-    }
-
-    static callbackGradeEffect(message, html, data, chatCard, tayiWPdata) {
-        const funcArgs = tayiWPdata['funcArgs'];
-        const applyFunc = tayiWPdata['applyFunc'];
-        for (let gradeLevel in funcArgs.grades) {
-            if (!funcArgs.grades.hasOwnProperty(gradeLevel)) {
-                continue;
+        Hooks.on('updateToken', (entity, data, options, userId) => {
+            if (!(options.hasOwnProperty('x') || options.hasOwnProperty('y'))) {
+                return;
             }
-            const btn = $(`<button>Apply ` + TayiWPConst.GRADE_NAMES[gradeLevel] + `</button>`);
-            chatCard.find('[data-grade="' + gradeLevel + '"]').after(btn);
-            btn.click(async ev => {
-                ev.stopPropagation();
-                await applyFunc(funcArgs, gradeLevel);
-            });
-        }
-        const btn2 = $(`<button>Remove effect</button>`);
-        const removeFunc = tayiWPdata['removeFunc'];
-        chatCard.append(btn2);
-        btn2.click(async ev => {
-            ev.stopPropagation();
-            await removeFunc(funcArgs);
+            const x = options.hasOwnProperty('x') ? options.x : data.x;
+            const y = options.hasOwnProperty('y') ? options.y : data.y;
+            // for (const callback_name in TayiWP.CALLBACKS_AURAS) {
+            //     if (!TayiWP.CALLBACKS_AURAS.hasOwnProperty(callback_name)) {
+            //         continue;
+            //     }
+            //     const aura_data = TayiWP.CALLBACKS_AURAS[callback_name];
+            //     const token_orig = entity.data.tokens.find(t => t._id === aura_data.token_id);
+            //     if (!token_orig) {
+            //         continue;
+            //     }
+            //     const dx = (token_orig.x - x) / entity.data.grid * entity.data.gridDistance;
+            //     const dy = (token_orig.y - y) / entity.data.grid * entity.data.gridDistance;
+            //     const diag = Math.min(dx, dy);
+            //     const diag_ft = (diag % 2 === 0) ? diag * 7.5 : (diag - 1) * 7.5 + 5;
+            //     const delta_ft = diag_ft + Math.max(dx, dy) * 5;
+            //     if (!(delta_ft >= aura_data.distance)) {
+            //         continue;
+            //     }
+            //     const callback_class = aura_data.callback_class;
+            //     const callback_data = callback_class.getCallback(aura_data);
+            //     callback_data.callback_func(entity, data, options, userId, callback_data.callback_args);
+            // }
         });
     }
 
-    static callbackSpellEffect(message, html, data, chatCard, tayiWPdata) {
-        const btn = $(`<button>Apply effect</button>`);
-        const btn2 = $(`<button>Remove effect</button>`);
-        const applyFunc = tayiWPdata['applyFunc'];
-        const removeFunc = tayiWPdata['removeFunc'];
-        const funcArgs = tayiWPdata['funcArgs'];
-        chatCard.append(btn);
-        chatCard.append(btn2);
-        btn.click(async ev => {
-            ev.stopPropagation();
-            await applyFunc(funcArgs);
-        });
-        btn2.click(async ev => {
-            ev.stopPropagation();
-            await removeFunc(funcArgs);
-        });
+    static registerCallback(callbackClass) {
+        const callbackName = callbackClass.getHandlerName();
+        TayiWP.HANDLERS_MESSAGE[callbackName] = callbackClass.getCallbackMessage();
     }
 
-    static ifActor() {
-        const actor = game.actors.get(ChatMessage.getSpeaker().actor);
-        if (actor) {
-            return actor;
-        }
-        ui.notifications.error("You must have an actor selected.");
-        return false;
-    }
-
-    static ifToken() {
-        const token = canvas.tokens.get(ChatMessage.getSpeaker().token);
-        if (token) {
-            return token;
-        }
-        ui.notifications.error("You must have an token selected.");
-        return false;
-    }
-
-    static ifCombat() {
-        const currentCombat = game.combat;
-        if (currentCombat) {
-            return currentCombat;
-        }
-        ui.notifications.error("You must be in combat.");
-        return false;
-    }
-
-    static async forEachControlledToken(applyFunc, funcArgs) {
-        const tokens = canvas.tokens.controlled;
-        for (let tokenNum in tokens) {
-            if (!tokens.hasOwnProperty(tokenNum)) {
-                continue;
-            }
-            const token = tokens[tokenNum];
-            const actor = token.actor;
-            await applyFunc(actor, token, funcArgs);
-        }
-    }
-
-    static async forEachTargetedToken(applyFunc, funcArgs) {
-        const iterator = game.user.targets.values();
-        for (let token = iterator.next().value; token; token = iterator.next().value) {
-            const actor = token.actor;
-            await applyFunc(TayiWP.ifActor(), actor, token, funcArgs);
-        }
-    }
-
-    static findActorItem(itemName, itemType) {
-        const actor = TayiWP.ifActor();
-        if (!actor) {
-            return;
-        }
-        let item = actor.data.items.filter(item => item.type === itemType)
-            .find(item => item.name === itemName);
-        if (item) {
-            return actor.getOwnedItem(item._id);
-        }
-    }
-
-    static async saySomething(actor, messageContent) {
+    static async postChatButtonEffect(effectName, effectDesc, funcArgs) {
+        const actor = TayiWPConst.ifActor();
         let speaker = { actor: actor, alias: actor.name };
-        // if (additionalData && additionalData['EXPIRED']) {
-        //     speaker = { alias: "Turn Alert" };
-        // }
+        if (funcArgs['EXPIRED']) {
+            speaker = { alias: "Turn Alert" };
+            effectDesc += ' EXPIRED';
+        }
         const chatData = {
             user: game.user._id,
             speaker: speaker,
-            content: messageContent
+            content: '<div class="' + TayiWPConst.CHAT_CARD_CLASS + '"><b>' + effectName + '</b><p>' + effectDesc
+            + '</p></div>',
+            flags: {}
+            // type: CONST.CHAT_MESSAGE_TYPES.OOC
         };
-        // if (additionalData) {
-        //     chatData[TayiWP.CHAT_DATA_NAME] = additionalData;
-        // }
-        return await ChatMessage.create(chatData, {});
-    }
-
-    // static rollSomething(formula, data, DC) {
-    //     const roll = new Roll(formula, data).roll();
-    //     const rollD20 = roll.dice[0].total;
-    //     const rollTotal = roll.total;
-    //     let grade = 1;
-    //     if (rollTotal >= DC) {
-    //         grade = 2;
-    //     }
-    //     if (rollD20 === 20 || rollTotal >= DC + 10) {
-    //         grade += 1;
-    //     }
-    //     if (rollD20 === 1 || rollTotal <= DC - 10) {
-    //         grade -= 1;
-    //     }
-    //     return {
-    //         roll: roll,
-    //         grade: grade
-    //     };
-    // }
-
-    static createParam(name, label, ptype, value) {
-        const x = this.createParamShort(name, label, ptype, value);
-        const y = this.createBorders();
-        x.text = y[0].text + x.text + y[1].text;
-        return x;
-    }
-
-    static createBorders() {
-        return [
-            {
-                name: '__BORDER__',
-                text: `
-          <div class="form-group">`
-            },
-            {
-                name: '__BORDER__',
-                text: `
-          </div>`
-            }
-        ];
-    }
-
-    static createParamShort(name, label, ptype, value) {
-        return {
-            name: name,
-            text: `
-            <label>` + label + `</label>
-            <input id="` + name + `" name="` + name + `" type="` + ptype + `" value="` + value + `"/>`
-        };
-    }
-
-    static createOptionParam(name, label, values) {
-        let selectContent = '';
-        for (let i in values) {
-            if (!values.hasOwnProperty(i)) {
-                continue;
-            }
-            selectContent += `<option value="` + values[i][0] +`">` + values[i][1] + `</option>`;
-        }
-        const x = this.createBorders();
-        return {
-            name: name,
-            text: x[0].text + `
-            <label>` + label + `</label>
-            <select id="` + name + `" name="` + name + `">
-                ` + selectContent + `
-            </select>` + x[1].text
-        };
+        chatData.flags[TayiWPConst.CHAT_DATA_NAME] = funcArgs;
+        await ChatMessage.create(chatData, {});
     }
 
     static async whenNextTurn(triggerWhen, combatantData, duration, macroName, argsArray) {
-        const actor = TayiWP.ifActor();
-        const combatCurrent = TayiWP.ifCombat();
+        const combatCurrent = TayiWPConst.ifCombat();
         if (!combatCurrent) {
             // saySomething(triggerWhen + combatantData.name + ": " + await textFunc());
             return;
@@ -231,7 +108,7 @@ export default class TayiWP {
 
         const alertData = {
             id: null,
-            name: TayiWP.CHAT_DATA_NAME + "Alert" + triggerWhen + combatantData._id + macroName,
+            name: TayiWPConst.CHAT_DATA_NAME + "Alert" + triggerWhen + combatantData._id + macroName,
             combatId: combatCurrent.data._id,
             createdRound: combatCurrent.data.round,
             round: roundNumber,
@@ -243,7 +120,7 @@ export default class TayiWP {
                 expire: duration,
                 expireAbsolute: false
             } : null,
-            label: TayiWP.CHAT_DATA_NAME + "Alert" + triggerWhen + combatantData._id + macroName,
+            label: TayiWPConst.CHAT_DATA_NAME + "Alert" + triggerWhen + combatantData._id + macroName,
             message: null,
             recipientIds: [],
             macro: macroName,
@@ -253,84 +130,5 @@ export default class TayiWP {
 
         await TurnAlert.create(alertData);
         // await new TurnAlertConfig(alertData).render(true);
-    }
-
-    static async whenNextRound(triggerWhen, roundNumber, duration, macroName, argsArray) {
-        const combatCurrent = TayiWP.ifCombat();
-        if (!combatCurrent) {
-            // saySomething(triggerWhen + combatantData.name + ": " + await textFunc());
-            return;
-        }
-
-        const alertData = {
-            id: null,
-            name: TayiWP.CHAT_DATA_NAME + "Alert" + triggerWhen + roundNumber + macroName,
-            combatId: combatCurrent.data._id,
-            createdRound: combatCurrent.data.round,
-            round: triggerWhen === TayiWPConst.COMBAT_TRIGGERS.ROUND_START ? roundNumber : roundNumber + 1,
-            roundAbsolute: false,
-            turnId: null,
-            endOfTurn: false,
-            repeating: duration > 1 ? {
-                frequency: 1,
-                expire: duration,
-                expireAbsolute: false
-            } : null,
-            label: TayiWP.CHAT_DATA_NAME + "Alert" + triggerWhen + roundNumber + macroName,
-            message: null,
-            recipientIds: [],
-            macro: macroName,
-            args: argsArray,
-            userId: game.userId
-        };
-
-        await TurnAlert.create(alertData);
-        // await new TurnAlertConfig(alertData).render(true);
-    }
-
-    static async postChatButtonEffect(effectName, effectDesc, funcArgs) {
-        const actor = TayiWP.ifActor();
-        let speaker = { actor: actor, alias: actor.name };
-        if (funcArgs['EXPIRED']) {
-            speaker = { alias: "Turn Alert" };
-            effectDesc += ' EXPIRED';
-        }
-        const chatData = {
-            user: game.user._id,
-            speaker: speaker,
-            content: '<div class="' + TayiWP.CHAT_CARD_CLASS + '"><b>' + effectName + '</b><p>' + effectDesc
-            + '</p></div>',
-            flags: {}
-            // type: CONST.CHAT_MESSAGE_TYPES.OOC
-        };
-        chatData.flags[TayiWP.CHAT_DATA_NAME] = funcArgs;
-        await ChatMessage.create(chatData, {});
-    }
-
-    static async postChatButtonGrade(effectName, effectDescFunc, funcArgs) {
-        const actor = TayiWP.ifActor();
-        let speaker = { actor: actor, alias: actor.name };
-        let effectDescAdd = '';
-        if (funcArgs['EXPIRED']) {
-            speaker = { alias: "Turn Alert" };
-            effectDescAdd += ' EXPIRED';
-        }
-        let messageContent = '<div class="' + TayiWP.CHAT_CARD_CLASS + '"><b>' + effectName + '</b>';
-        for (let gradeLevel in funcArgs.grades) {
-            if (!funcArgs.grades.hasOwnProperty(gradeLevel)) {
-                continue;
-            }
-            messageContent += '<p data-grade="' + gradeLevel + '">'
-                + effectDescFunc(funcArgs, gradeLevel) + effectDescAdd + '</p>';
-        }
-        const chatData = {
-            user: game.user._id,
-            speaker: speaker,
-            content: messageContent + '</div>',
-            flags: {}
-            // type: CONST.CHAT_MESSAGE_TYPES.OOC
-        };
-        chatData.flags[TayiWP.CHAT_DATA_NAME] = funcArgs;
-        await ChatMessage.create(chatData, {});
     }
 }

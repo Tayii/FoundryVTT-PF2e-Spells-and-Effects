@@ -1,4 +1,7 @@
 export default class TayiWPConst {
+    static CHAT_CARD_CLASS = "tayi-wp-macro";
+    static CHAT_DATA_NAME = "tayiwp";
+
     static RANK_NAMES = {
         0: "Untrained",
         1: "Trained",
@@ -28,16 +31,166 @@ export default class TayiWPConst {
         ROUND_END: "ROUND_END",
     };
 
-    static DC_BY_LEVEL = (() => {
-        const arr = {};
-        for (let lvl = 0; lvl <= 25; lvl++) {
-            if (lvl <= 20) {
-                arr[lvl] = 14 + lvl + Math.floor(lvl / 3);
-            }
-            else {
-                arr[lvl] = lvl * 2;
-            }
+    static getDC_by_LEVEL(lvl) {
+        if (lvl <= 20) {
+            return 14 + lvl + Math.floor(lvl / 3);
         }
-        return arr;
-    })();
+        else {
+            return lvl * 2;
+        }
+    };
+
+    static getGRADE_by_ROLL(roll, DC) {
+        const rollD20 = roll.dice[0].total;
+        const rollTotal = roll.total;
+        let grade = 1;
+        if (rollTotal >= DC) {
+            grade = 2;
+        }
+        if (rollD20 === 20 || rollTotal >= DC + 10) {
+            grade += 1;
+        }
+        if (rollD20 === 1 || rollTotal <= DC - 10) {
+            grade -= 1;
+        }
+        return grade;
+    };
+
+    static getSPELL_LEVEL(actor_level) {
+        return Math.ceil(actor_level / 2);
+    }
+
+    static createParam(name, label, ptype, value) {
+        const x = this.createParamShort(name, label, ptype, value);
+        const y = this.createBorders();
+        x.text = y[0].text + x.text + y[1].text;
+        return x;
+    }
+
+    static createBorders() {
+        return [
+            {
+                name: '__BORDER__',
+                text: `
+          <div class="form-group">`
+            },
+            {
+                name: '__BORDER__',
+                text: `
+          </div>`
+            }
+        ];
+    }
+
+    static createParamShort(name, label, ptype, value) {
+        return {
+            name: name,
+            text: `
+            <label>` + label + `</label>
+            <input id="` + name + `" name="` + name + `" type="` + ptype + `" value="` + value + `"/>`
+        };
+    }
+
+    static createOptionParam(name, label, values) {
+        let selectContent = '';
+        for (let i in values) {
+            if (!values.hasOwnProperty(i)) {
+                continue;
+            }
+            selectContent += `<option value="` + values[i][0] +`">` + values[i][1] + `</option>`;
+        }
+        const x = this.createBorders();
+        return {
+            name: name,
+            text: x[0].text + `
+            <label>` + label + `</label>
+            <select id="` + name + `" name="` + name + `">
+                ` + selectContent + `
+            </select>` + x[1].text
+        };
+    }
+
+    static ifActor() {
+        const actor = game.actors.get(ChatMessage.getSpeaker().actor);
+        if (actor) {
+            return actor;
+        }
+        ui.notifications.error("You must have an actor selected.");
+        return false;
+    }
+
+    static ifToken() {
+        const token = canvas.tokens.get(ChatMessage.getSpeaker().token);
+        if (token) {
+            return token;
+        }
+        ui.notifications.error("You must have an token selected.");
+        return false;
+    }
+
+    static ifCombat() {
+        const currentCombat = game.combat;
+        if (currentCombat) {
+            return currentCombat;
+        }
+        ui.notifications.error("You must be in combat.");
+        return false;
+    }
+
+    static async forEachControlledToken(applyFunc, funcArgs) {
+        const tokens = canvas.tokens.controlled;
+        for (let tokenNum in tokens) {
+            if (!tokens.hasOwnProperty(tokenNum)) {
+                continue;
+            }
+            const token = tokens[tokenNum];
+            const actor = token.actor;
+            await applyFunc(actor, token, funcArgs);
+        }
+    }
+
+    static async forEachTargetedToken(applyFunc, funcArgs) {
+        const iterator = game.user.targets.values();
+        for (let token = iterator.next().value; token; token = iterator.next().value) {
+            const actor = token.actor;
+            await applyFunc(this.ifActor(), actor, token, funcArgs);
+        }
+    }
+
+    static findActorItem(itemName, itemType) {
+        const actor = this.ifActor();
+        if (!actor) {
+            return;
+        }
+        let item = actor.data.items.filter(item => item.type === itemType)
+            .find(item => item.name === itemName);
+        if (item) {
+            return actor.getOwnedItem(item._id);
+        }
+    }
+
+    static async saySomething(actor, messageContent) {
+        let speaker = { actor: actor, alias: actor.name };
+        // if (additionalData && additionalData['EXPIRED']) {
+        //     speaker = { alias: "Turn Alert" };
+        // }
+        const chatData = {
+            user: game.user._id,
+            speaker: speaker,
+            content: messageContent
+        };
+        // if (additionalData) {
+        //     chatData[TayiWPConst.CHAT_DATA_NAME] = additionalData;
+        // }
+        return await ChatMessage.create(chatData, {});
+    }
+
+    static createButton(chat_card, btnName, clickFunc, funcArgs) {
+        const btn = $(`<button>` + btnName + `</button>`);
+        chat_card.append(btn);
+        btn.click(async ev => {
+            ev.stopPropagation();
+            await clickFunc(funcArgs);
+        });
+    }
 }

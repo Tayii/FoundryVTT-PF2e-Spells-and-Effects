@@ -1,7 +1,10 @@
-import TayiWPSpellShield from '../spells/castShield.js';
-import TayiWPSpellLayOnHands from '../spells/castLayOnHands.js';
+import TayiWPSpellLayOnHands from "./spells/layOnHands.js";
 
-const TAYIWP_SPELL_CALLBACKS = {};
-TAYIWP_SPELL_CALLBACKS[TayiWPSpellShield.spellName] = TayiWPSpellShield;
-TAYIWP_SPELL_CALLBACKS[TayiWPSpellLayOnHands.spellName] = TayiWPSpellLayOnHands;
-export default TAYIWP_SPELL_CALLBACKS;
+const l = [
+    TayiWPSpellLayOnHands
+];
+const TAYIWP_SPELLS = {};
+for (const spell_class of l) {
+    TAYIWP_SPELLS[spell_class.HANDLER_NAME] = spell_class;
+}
+export default TAYIWP_SPELLS;

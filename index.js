@@ -1,15 +1,16 @@
-import TAYIWP_SPELL_CALLBACKS from './lists/spells.js';
-import TAYIWP_FEAT_CALLBACKS from './lists/feats.js';
-import TayiWP from "./src/base.js";
+import TAYIWP_SPELLS from './lists/spells.js';
 
-// Hooks.on("init", function() {
-//     console.log("This code runs once the Foundry VTT software begins it's initialization workflow.");
-// });
+import TayiWP from "./src/base.js";
 
 Hooks.on("ready", function() {
     console.log("This code runs once core initialization is ready and game data is available.");
-    TayiWP.SPELL_CALLBACKS = TAYIWP_SPELL_CALLBACKS;
-    TayiWP.FEAT_CALLBACKS = TAYIWP_FEAT_CALLBACKS;
     TayiWP.init();
+    for (const spell_name in TAYIWP_SPELLS) {
+        if (!TAYIWP_SPELLS.hasOwnProperty(spell_name))
+            continue;
+        const spell_class = TAYIWP_SPELLS[spell_name];
+        TayiWP.registerCallback(spell_class);
+    }
     globalThis.TayiWP = TayiWP;
+    globalThis.TAYIWP_SPELLS = TAYIWP_SPELLS;
 });
