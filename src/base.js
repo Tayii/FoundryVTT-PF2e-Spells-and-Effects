@@ -20,7 +20,7 @@ export default class TayiWP {
                 return;
             }
             // 2) определить, каким обработчиком нужно обработать сообщение
-            //  - если название обработчика (TayiWPFlagsClass.HANDLER_NAME) есть
+            //  - если название обработчика (TayiWPFlagsClass.SUBCLASS_NAME) есть
             //      в списке обработчиков (HANDLERS_MESSAGE)
             const effect_data = flags[TayiWPConst.CHAT_DATA_NAME];
             if (!TayiWP.HANDLERS_MESSAGE.hasOwnProperty(effect_data.HANDLER_NAME)

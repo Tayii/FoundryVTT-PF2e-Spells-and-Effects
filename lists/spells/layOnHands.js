@@ -21,7 +21,7 @@ class TayiWPSpellAttributesLayOnHands extends TayiWPSpellLevel {
 }
 
 export default class TayiWPSpellLayOnHands extends TayiWPSpell {
-    static HANDLER_NAME = 'Lay on Hands';
+    static SUBCLASS_NAME = 'Lay on Hands';
     static DIALOG_LEVEL_MIN = 1;
     static ROLL_ITEM = false;
 
@@ -46,26 +46,20 @@ export default class TayiWPSpellLayOnHands extends TayiWPSpell {
 
     async dialogCallback(spellParams) {
         const actor = TayiWPConst.ifActor();
-        // let messageContent = '';
-        let name = this.getClass().HANDLER_NAME;
+        let name = spellParams.SUBCLASS_NAME;
         if (spellParams.spell_target === 'ally')
             name += ' (' + spellParams.spell_target + ')';
         await TayiWPSpell.findActorItem(name).roll();
         switch (spellParams.spell_target) {
             case 'ally':
-                // spellParams.healing = parseInt(spellParams.healing);
                 spellParams.ac_bonus = parseInt(spellParams.ac_bonus);
-                // messageContent = "healing = <b>[[" + spellParams.healing + "]]</b>";
                 break;
             case 'undead':
                 spellParams.ac_penalty = parseInt(spellParams.ac_penalty);
-            // const roll = TayiWP.rollSomething("@damage_roll", {damage_roll: spellParaTayiWPSpellLayOnHandsms.damage_roll}, 0);
-            // messageContent = "damage = <b>[[" + roll.roll.result + "]]</b>";
         }
-        // await TayiWP.saySomething(spellParams.getSpellName() + ': ' + messageContent);
         await this.createEffectButton(spellParams);
         spellParams['EXPIRED'] = true;
-        await TayiWP.whenNextTurn(TayiWPConst.COMBAT_TRIGGERS.TURN_START, actor.data, 1, this.getClass().getMacroName(),
+        await TayiWP.whenNextTurn(TayiWPConst.COMBAT_TRIGGERS.TURN_START, actor.data, 1, spellParams.MACRO_NAME,
             [spellParams]);
     }
 
@@ -91,7 +85,7 @@ export default class TayiWPSpellLayOnHands extends TayiWPSpell {
     }
 
     static async buttonClickApplyEffect(spellParams) {
-        const name = spellParams.HANDLER_NAME + ' (' + spellParams.spell_target + ')';
+        const name = spellParams.SUBCLASS_NAME + ' (' + spellParams.spell_target + ')';
         await TayiWPConst.forEachControlledToken(async (actor, token, spellParams) => {
             let messageContent = ' status AC';
             switch (spellParams.spell_target) {
@@ -115,7 +109,7 @@ export default class TayiWPSpellLayOnHands extends TayiWPSpell {
 
     static async buttonClickRemoveEffect(spellParams) {
         await TayiWPConst.forEachControlledToken(async (actor, token, spellParams) => {
-            actor.removeCustomModifier('ac', spellParams.HANDLER_NAME + ' (' + spellParams.spell_target + ')');
+            actor.removeCustomModifier('ac', spellParams.SUBCLASS_NAME + ' (' + spellParams.spell_target + ')');
             let messageContent = ' status AC';
             switch (spellParams.spell_target) {
                 case 'ally':

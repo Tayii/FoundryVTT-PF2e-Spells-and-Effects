@@ -157,6 +157,14 @@ export default class TayiWPConst {
         }
     }
 
+    static async forEachAffectedToken(applyFunc, params) {
+        for (const affected of params.affected_ids) {
+            const token = canvas.tokens.get(affected[0]);
+            const actor = game.actors.find(a => a._id === affected[1]);
+            await applyFunc(this.ifActor(), actor, token, params);
+        }
+    }
+
     static findActorItem(itemName, itemType) {
         const actor = this.ifActor();
         if (!actor) {
