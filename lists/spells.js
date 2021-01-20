@@ -6,7 +6,7 @@ const l = [
     TayiWPSpellShield,
 ];
 const TAYIWP_SPELLS = {};
-for (const spell_class of l) {
-    TAYIWP_SPELLS[spell_class.SUBCLASS_NAME] = spell_class;
+for (const _class of l) {
+    TAYIWP_SPELLS[_class.SUBCLASS_NAME] = _class;
 }
 export default TAYIWP_SPELLS;

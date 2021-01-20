@@ -155,7 +155,7 @@ export default class TayiWPHandlerClass {
                         dialogParamsAfter[dialogParams[i].name] = html.find('[name="' + dialogParams[i].name + '"]')[0].value;
                     }
                     if (dialogParamsAfter['show-info'] === 'yes') {
-                        await this.getClass().findActorItem(this.getClass().SUBCLASS_NAME).roll(event);
+                        await this.getClass().findActorItem(this.getClass().SUBCLASS_NAME).roll();
                     }
                     dialogParamsAfter.source_actor_id = TayiWPConst.ifActor()._id;
                     dialogParamsAfter.SUBCLASS_NAME = this.getClass().SUBCLASS_NAME;

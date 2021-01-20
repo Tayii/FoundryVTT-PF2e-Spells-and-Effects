@@ -2,12 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e60f8325-0996-4542-aacb-f193aa4f4423" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/tayiwp-pf2e.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/tayiwp-pf2e.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/categories/clReq.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/categories/clSkillGrade.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/categories/clSkillRank.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lists/skills.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lists/spells/layOnHands.js" beforeDir="false" afterPath="$PROJECT_DIR$/lists/spells/layOnHands.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lists/spells/shield.js" beforeDir="false" afterPath="$PROJECT_DIR$/lists/spells/shield.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/base.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/base.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/clFlags.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/clFlags.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lists/spells.js" beforeDir="false" afterPath="$PROJECT_DIR$/lists/spells.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/clHandler.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/clHandler.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/const.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/const.js" afterDir="false" />
     </list>
@@ -20,16 +21,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="clHandler.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/clHandler.js">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
       <file leaf-file-name="layOnHands.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lists/spells/layOnHands.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="45" column="40" selection-start-line="45" selection-start-column="40" selection-end-line="45" selection-end-column="40" />
+            <state relative-caret-position="270">
+              <caret line="27" lean-forward="true" selection-start-line="27" selection-end-line="27" />
               <folding>
                 <element signature="e#0#45#0" expanded="true" />
               </folding>
@@ -37,11 +33,47 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="const.js" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/const.js">
+      <file leaf-file-name="featTreatWounds.js" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/feats/featTreatWounds.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="689">
-              <caret line="184" column="5" lean-forward="true" selection-start-line="184" selection-start-column="5" selection-end-line="184" selection-end-column="5" />
+            <state relative-caret-position="1321">
+              <caret line="97" column="17" lean-forward="true" selection-start-line="97" selection-start-column="17" selection-end-line="97" selection-end-column="17" />
+              <folding>
+                <element signature="e#0#36#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="clHandler.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/clHandler.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="269">
+              <caret line="151" column="62" lean-forward="true" selection-start-line="151" selection-start-column="62" selection-end-line="151" selection-end-column="62" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="spells.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lists/spells.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="216">
+              <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
+              <folding>
+                <element signature="e#0#59#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="shield.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lists/spells/shield.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="89">
+              <caret line="87" column="32" lean-forward="true" selection-start-line="87" selection-start-column="32" selection-end-line="87" selection-end-column="32" />
+              <folding>
+                <element signature="e#0#45#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -75,6 +107,10 @@
       <find>.HANDLER_NAME</find>
       <find>createAlert</find>
       <find>HANDLER_NAME</find>
+      <find>RawSkillData</find>
+      <find>SkillData</find>
+      <find>DIALOG_LEVEL_MAX</find>
+      <find>dialogLevels</find>
     </findStrings>
     <replaceStrings>
       <replace>$1export class $2 \{</replace>
@@ -125,16 +161,23 @@
         <option value="$PROJECT_DIR$/categories/clSpellLevel.js" />
         <option value="$PROJECT_DIR$/index.js" />
         <option value="$USER_HOME$/Documents/projects/www/features/screen/require_wsupdater.php" />
-        <option value="$PROJECT_DIR$/categories/clSpell.js" />
         <option value="$PROJECT_DIR$/module.json" />
-        <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/lists/spells.js" />
         <option value="$PROJECT_DIR$/src/base.js" />
-        <option value="$PROJECT_DIR$/src/clHandler.js" />
-        <option value="$PROJECT_DIR$/lists/spells/layOnHands.js" />
         <option value="$PROJECT_DIR$/src/clFlags.js" />
         <option value="$PROJECT_DIR$/lists/spells/shield.js" />
+        <option value="$PROJECT_DIR$/lists/skills.js" />
+        <option value="$PROJECT_DIR$/lists/spells.js" />
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/categories/clSkillGrade.js" />
+        <option value="$PROJECT_DIR$/categories/clSkillRank.js" />
+        <option value="$PROJECT_DIR$/lists/skills/treatWounds.js" />
+        <option value="$PROJECT_DIR$/lists/spells/layOnHands.js" />
+        <option value="$PROJECT_DIR$/categories/clSkillReq.js" />
+        <option value="$PROJECT_DIR$/categories/clSkill.js" />
+        <option value="$PROJECT_DIR$/categories/clSpell.js" />
+        <option value="$PROJECT_DIR$/categories/clReq.js" />
         <option value="$PROJECT_DIR$/src/const.js" />
+        <option value="$PROJECT_DIR$/src/clHandler.js" />
       </list>
     </option>
   </component>
@@ -159,18 +202,12 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="tayiwp-pf2e" type="b2602c69:ProjectViewProjectNode" />
               <item name="tayiwp-pf2e" type="47feb1d3:ProjectViewModuleNode" />
-            </path>
-            <path>
-              <item name="tayiwp-pf2e" type="b2602c69:ProjectViewProjectNode" />
-              <item name="tayiwp-pf2e" type="47feb1d3:ProjectViewModuleNode" />
-              <item name="scripts" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="tayiwp-pf2e" type="b2602c69:ProjectViewProjectNode" />
@@ -194,6 +231,13 @@
               <item name="tayiwp-pf2e" type="47feb1d3:ProjectViewModuleNode" />
               <item name="tayiwp-pf2e" type="462c0819:PsiDirectoryNode" />
               <item name="lists" type="462c0819:PsiDirectoryNode" />
+              <item name="skills" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="tayiwp-pf2e" type="b2602c69:ProjectViewProjectNode" />
+              <item name="tayiwp-pf2e" type="47feb1d3:ProjectViewModuleNode" />
+              <item name="tayiwp-pf2e" type="462c0819:PsiDirectoryNode" />
+              <item name="lists" type="462c0819:PsiDirectoryNode" />
               <item name="spells" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -206,23 +250,26 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="add_unversioned_files" value="$PROJECT_DIR$/.gitignore" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="JavaScript" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../turnAlert/scripts" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+    <property name="settings.editor.selected.configurable" value="settings.github" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/chat_buttons" />
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/categories" />
+      <recent name="$PROJECT_DIR$" />
       <recent name="$USER_HOME$/Downloads/foundry/resources/app/public/scripts" />
     </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$" />
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/chat_buttons" />
       <recent name="$USER_HOME$/Downloads/foundry/resources/app/public/scripts" />
     </key>
   </component>
@@ -239,7 +286,7 @@
     </option>
   </component>
   <component name="SvnConfiguration">
-    <configuration />
+    <configuration>$USER_HOME$/.subversion</configuration>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -256,7 +303,9 @@
       <workItem from="1610691955881" duration="2721000" />
       <workItem from="1610770734358" duration="599000" />
       <workItem from="1610865472380" duration="19566000" />
-      <workItem from="1610953754346" duration="19852000" />
+      <workItem from="1610953754346" duration="20489000" />
+      <workItem from="1611143241587" duration="1523000" />
+      <workItem from="1611144775412" duration="9878000" />
     </task>
     <task id="LOCAL-00001" summary="-1.1.0&#10;major rewrites">
       <created>1610959263586</created>
@@ -272,22 +321,30 @@
       <option name="project" value="LOCAL" />
       <updated>1610966428661</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="v1.1.2&#10;added affected_ids">
+      <created>1610977914180</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1610977914180</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="65704000" />
+    <option name="totallyTimeSpent" value="77742000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="72" y="475" width="1646" height="965" extended-state="0" />
     <editor active="true" />
     <layout>
+      <window_info anchor="bottom" id="TypeScript" order="7" />
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15650031" />
       <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Messages" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32848486" />
-      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" weight="0.32969698" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32848486" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" />
@@ -297,15 +354,25 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="bottom" id="TypeScript" order="7" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32848486" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
@@ -313,7 +380,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="-1.1.0&#10;major rewrites" />
     <MESSAGE value="v1.1.1&#10;added spell: Shield&#10;added forEachAffectedToken()" />
-    <option name="LAST_COMMIT_MESSAGE" value="v1.1.1&#10;added spell: Shield&#10;added forEachAffectedToken()" />
+    <MESSAGE value="v1.1.2&#10;added affected_ids" />
+    <option name="LAST_COMMIT_MESSAGE" value="v1.1.2&#10;added affected_ids" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -321,67 +389,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.js" />
-    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/foundry-vtt---pathfinder-2e-master-src-module/src/module/combat.ts">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/feats/gradeBonMot.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1308">
-          <caret line="21" column="28" lean-forward="true" selection-start-line="21" selection-start-column="28" selection-end-line="21" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/foundry-vtt---pathfinder-2e-master-src-module/src/module/modifiers.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="544">
-          <caret line="314" column="2" selection-start-line="314" selection-start-column="2" selection-end-line="314" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/foundry-vtt---pathfinder-2e-master-src-module/src/module/item/spellcastingEntry.ts">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/foundry-vtt---pathfinder-2e-master-src-module/src/module/item/spell.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1542" />
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/foundry-vtt---pathfinder-2e-master-src-module/src/module/actor/familiar.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="171" column="46" selection-start-line="171" selection-start-column="46" selection-end-line="171" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/foundry-vtt---pathfinder-2e-master-src-module/src/module/system/check-modifiers-dialog.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1080">
-          <caret line="31" column="4" selection-start-line="31" selection-start-column="4" selection-end-line="31" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/foundry-vtt---pathfinder-2e-master-src-module/src/module/actor/character.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
-          <caret line="186" column="26" selection-start-line="186" selection-start-column="26" selection-end-line="186" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/src/const.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="15" column="21" lean-forward="true" selection-start-line="15" selection-start-column="21" selection-end-line="15" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/src/baseRoll.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="114">
-          <caret line="32" column="14" lean-forward="true" selection-start-line="32" selection-start-column="14" selection-end-line="32" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/foundry-vtt---pathfinder-2e-master-src-module/src/module/system/rolls.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="612">
@@ -396,13 +403,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/spells/castShield.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="334">
-          <caret line="97" column="27" selection-start-line="97" selection-start-column="27" selection-end-line="97" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/spells/castShield.js" />
     <entry file="file://$PROJECT_DIR$/src/chat_buttons/flagsButtonsClass.ts" />
     <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/foundry-vtt---pathfinder-2e-master-src-module/src/module/actor/actor.ts">
       <provider selected="true" editor-type-id="text-editor">
@@ -411,27 +412,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/src/baseAttrs.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="396">
-          <caret line="22" column="19" selection-start-line="22" selection-start-column="19" selection-end-line="22" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/spells/castLayOnHands.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2286">
-          <caret line="130" column="28" selection-start-line="130" selection-start-column="28" selection-end-line="130" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/src/spellsClass.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="8" column="11" selection-start-line="8" selection-start-column="11" selection-end-line="8" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/src/baseAttrs.js" />
+    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/spells/castLayOnHands.js" />
+    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/src/spellsClass.js" />
     <entry file="file://$PROJECT_DIR$/test.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="787">
@@ -489,24 +472,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/src/baseClass.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="667">
-          <caret line="127" lean-forward="true" selection-start-line="127" selection-end-line="127" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/src/baseClass.js" />
     <entry file="file://$PROJECT_DIR$/../turnAlert/scripts/utils.js">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/../turnAlert/scripts/patches.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="e#0#57#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/../turnAlert/scripts/const.js">
       <provider selected="true" editor-type-id="text-editor" />
@@ -515,9 +486,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="342">
           <caret line="28" lean-forward="true" selection-start-line="28" selection-end-line="28" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -542,47 +510,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/categories/clSpellLevel.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
-          <caret line="2" column="55" selection-start-line="2" selection-start-column="55" selection-end-line="2" selection-end-column="55" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Downloads/foundry/resources/app/public/scripts/foundry.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="257">
           <caret line="33349" column="9" selection-start-line="33349" selection-start-column="9" selection-end-line="33349" selection-end-column="9" />
-          <folding>
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/categories/clSpell.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
-          <folding>
-            <element signature="e#0#42#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lists/spells.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
-          <folding>
-            <element signature="e#0#59#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -590,21 +521,8 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="288">
           <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
-          <folding>
-            <element signature="e#0#46#0" expanded="true" />
-          </folding>
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/clDialogLevel.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/clHandler.js">
-      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/src/base.js">
       <provider selected="true" editor-type-id="text-editor">
@@ -627,6 +545,41 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="506">
+          <caret line="114" lean-forward="true" selection-start-line="114" selection-end-line="114" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/categories/clSpellLevel.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="54">
+          <caret line="3" column="1" lean-forward="true" selection-start-line="3" selection-start-column="1" selection-end-line="3" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/foundry-vtt---pathfinder-2e-master-src-module/src/module/actor/sheet/RecallKnowledgePopup.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="414">
+          <caret line="24" column="24" selection-start-line="24" selection-start-column="24" selection-end-line="24" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/foundry-vtt---pathfinder-2e-master-src-module/src/module/modifiers.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="50">
+          <caret line="330" column="13" selection-start-line="330" selection-start-column="13" selection-end-line="330" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/foundry-vtt---pathfinder-2e-master-src-module/src/module/actor/actorDataDefinitions.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="293">
+          <caret line="48" column="8" selection-start-line="48" selection-start-column="4" selection-end-line="48" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/clFlags.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
@@ -634,19 +587,108 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lists/spells/layOnHands.js">
+    <entry file="file://$PROJECT_DIR$/src/clDialogLevel.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="45" column="40" selection-start-line="45" selection-start-column="40" selection-end-line="45" selection-end-column="40" />
+        <state relative-caret-position="36">
+          <caret line="2" column="51" selection-start-line="2" selection-start-column="51" selection-end-line="2" selection-end-column="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external/lib.es2015.iterable.d.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="266">
+          <caret line="61" column="4" selection-start-line="61" selection-start-column="4" selection-end-line="61" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/categories/clSpell.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lists/skills/treatWounds.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="918">
+          <caret line="51" lean-forward="true" selection-start-line="51" selection-end-line="51" />
           <folding>
             <element signature="e#0#45#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/categories/clSkill.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lists/skills.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/categories/clSkillGrade.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="36">
+          <caret line="2" column="37" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/categories/clSkillRank.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="72">
+          <caret line="4" column="1" lean-forward="true" selection-start-line="4" selection-start-column="1" selection-end-line="4" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/categories/clReq.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1458">
+          <caret line="81" lean-forward="true" selection-start-line="81" selection-end-line="81" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/const.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="575">
+          <caret line="113" column="5" lean-forward="true" selection-start-line="113" selection-start-column="5" selection-end-line="113" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lists/spells/layOnHands.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="27" lean-forward="true" selection-start-line="27" selection-end-line="27" />
+          <folding>
+            <element signature="e#0#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lists/spells.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
+          <folding>
+            <element signature="e#0#59#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Documents/projects/tayiwp-pf2e/feats/featTreatWounds.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1321">
+          <caret line="97" column="17" lean-forward="true" selection-start-line="97" selection-start-column="17" selection-end-line="97" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#36#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/lists/spells/shield.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1187">
+        <state relative-caret-position="89">
           <caret line="87" column="32" lean-forward="true" selection-start-line="87" selection-start-column="32" selection-end-line="87" selection-end-column="32" />
           <folding>
             <element signature="e#0#45#0" expanded="true" />
@@ -654,10 +696,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/const.js">
+    <entry file="file://$PROJECT_DIR$/src/clHandler.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="689">
-          <caret line="184" column="5" lean-forward="true" selection-start-line="184" selection-start-column="5" selection-end-line="184" selection-end-column="5" />
+        <state relative-caret-position="269">
+          <caret line="151" column="62" lean-forward="true" selection-start-line="151" selection-start-column="62" selection-end-line="151" selection-end-column="62" />
         </state>
       </provider>
     </entry>

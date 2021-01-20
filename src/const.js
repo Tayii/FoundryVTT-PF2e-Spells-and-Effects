@@ -91,21 +91,24 @@ export default class TayiWPConst {
         };
     }
 
-    static createOptionParam(name, label, values) {
+    static createOptionParam(name, label, values, selected_val = 0) {
         let selectContent = '';
         for (let i in values) {
             if (!values.hasOwnProperty(i)) {
                 continue;
             }
-            selectContent += `<option value="` + values[i][0] +`">` + values[i][1] + `</option>`;
+            let selected = "";
+            if (i === selected_val)
+                selected = "selected";
+            selectContent += `<option value="${values[i][0]}" ${selected}>${values[i][1]}</option>`;
         }
         const x = this.createBorders();
         return {
             name: name,
             text: x[0].text + `
-            <label>` + label + `</label>
-            <select id="` + name + `" name="` + name + `">
-                ` + selectContent + `
+            <label>${label}</label>
+            <select id="${name}" name="${name}">
+                ${selectContent}
             </select>` + x[1].text
         };
     }
