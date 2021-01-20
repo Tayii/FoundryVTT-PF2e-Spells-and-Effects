@@ -5,6 +5,7 @@ export default class TayiWPReq {
     name = '';
     level = 1;
     subreqs = [];
+    sort_value = 0;
 
     // code = '';
     // value = 0;
@@ -31,7 +32,7 @@ export default class TayiWPReq {
     ifCheckSpell(actor) {
         const item = TayiWPConst.ifActorItem(this.name, this.type.toLowerCase());
         if (!item) {
-            ui.notifications.error(`You must have the ${this.name} ${this.type.toLowerCase()}.`);
+            // ui.notifications.error(`You must have the ${this.name} ${this.type.toLowerCase()}.`);
             return false;
         }
         const actorSpellLevel = TayiWPConst.getSPELL_LEVEL(actor.level);
@@ -40,7 +41,7 @@ export default class TayiWPReq {
         return false;
     }
 
-    ifSkillCheck(actor) {
+    ifCheckSkill(actor) {
         for (const skill_code in actor.data.data.skills) {
             if (!actor.data.data.skills.hasOwnProperty(skill_code)) {
                 continue;
@@ -49,12 +50,21 @@ export default class TayiWPReq {
             if (this.name === skill.name && this.level <= skill.rank) {
                 return new TayiWPReq(this.type, this.name, skill.rank).update({
                     code: skill_code,
-                    value: skill.value
+                    sort_value: skill.value
                 });
             }
         }
-        const rank_name = TayiWPConst.RANK_NAMES[this.level];
-        ui.notifications.error(`You must be at least ${rank_name} in the ${this.name} ${this.type.toLowerCase()}.`);
+        // const rank_name = TayiWPConst.RANK_NAMES[this.level];
+        // ui.notifications.error(`You must be at least ${rank_name} in the ${this.name} ${this.type.toLowerCase()}.`);
+        return false;
+    }
+
+    ifCheckFeat(actor) {
+        const item = TayiWPConst.ifActorItem(this.name, this.type.toLowerCase());
+        if (item) {
+            return true;
+        }
+        // ui.notifications.error(`You must have the ${this.name} ${this.type.toLowerCase()}.`);
         return false;
     }
 
@@ -65,7 +75,10 @@ export default class TayiWPReq {
                 answer = this.ifCheckSpell(actor);
                 break;
             case "SKILL":
-                answer = this.ifSkillCheck(actor);
+                answer = this.ifCheckSkill(actor);
+                break;
+            case "FEAT":
+                answer = this.ifCheckFeat(actor);
                 break;
             default:
                 break;

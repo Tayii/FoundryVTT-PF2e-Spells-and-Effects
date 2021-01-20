@@ -84,7 +84,10 @@ export default class TayiWPSkillTreatWounds extends TayiWPSkill {
     static HANDLER_TYPE = 'ACTION';
     static SUBCLASS_NAME = 'Treat Wounds';
     static USE_REQUIREMENTS = [
-        new TayiWPReq("SKILL", "medicine", 1)
+        new TayiWPReq("SKILL", "medicine", 1),
+        new TayiWPReq("SKILL", "nature", 1).add_subreq(
+            new TayiWPReq("FEAT", "Natural Medicine")
+        )
     ];
 
     static getDialogOptionPerLevel(level) {
@@ -94,36 +97,26 @@ export default class TayiWPSkillTreatWounds extends TayiWPSkill {
     async dialogCallback(req, dialogParams) {
         const actor = TayiWPConst.ifActor();
         const actionDC = parseInt(dialogParams.dc);
-        let skill;
-        for (let skillCode in actor.data.data.skills) {
-            if (!actor.data.data.skills.hasOwnProperty(skillCode)) {
-                continue;
-            }
-            if (actor.data.data.skills[skillCode].name === req.name) {
-                skill = actor.data.data.skills[skillCode];
-                break;
-            }
-        }
+        const skill = actor.data.data.skills[req.code];
         // const options = ['secret'];
-        // const label = game.i18n.format('PF2E.SkillCheckWithName', { skillName: game.i18n.localize(req.name) });
-        // const x = new CheckModifiersDialog(new PF2CheckModifier(label, skill),
-        //     { actor: actor, type: 'skill-check', options }, (roll) => { console.log(456); });
-        // x.roll = (check, context, callback) => { console.log(123); };
-        // x.render(true);
-        const roll = new TayiWPRoll("d20 + @total").roll({total: skill.totalModifier}).vsDC(actionDC);
-        await roll.result.toMessage();
-        const prof = TayiWPConst.RANK_NAMES[dialogParams.level];
-        const messageContent = `proficiency level <b>${prof}</b>, ${roll.toString()}`;
-        await TayiWPConst.saySomething(actor, `${dialogParams.MACRO_NAME}: ${messageContent}`);
-        if (!dialogParams.setGrade(roll.grade) || dialogParams.formula.length === 0) {
-            return;
-        }
-        const roll2 = new TayiWPRoll(dialogParams.formula).roll({});
-        await roll2.result.toMessage();
-        await TayiWPConst.forEachTargetedToken(async (owner_actor, target_actor, target_token, dialogParams) => {
-            const messageContent = `target <b>${target_token.data.name}</b> receives <b>${roll2.result.total}`
-                + `</b> ${dialogParams.meaning}`;
-            await TayiWPConst.saySomething(owner_actor, `${dialogParams.MACRO_NAME}: ${messageContent}`);
-        }, dialogParams);
+        // const events = {"shiftKey": true};
+        skill.roll({}, [], async (roll) => {
+            const wproll = new TayiWPRoll();
+            wproll.result = roll;
+            wproll.vsDC(actionDC);
+            const prof = TayiWPConst.RANK_NAMES[dialogParams.level];
+            const messageContent = `proficiency level <b>${prof}</b>, ${wproll.toString()}`;
+            await TayiWPConst.saySomething(actor, `${dialogParams.MACRO_NAME}: ${messageContent}`);
+            if (!dialogParams.setGrade(wproll.grade) || dialogParams.formula.length === 0) {
+                return;
+            }
+            const roll2 = new TayiWPRoll(dialogParams.formula).roll({});
+            await roll2.result.toMessage();
+            await TayiWPConst.forEachTargetedToken(async (owner_actor, target_actor, target_token, dialogParams) => {
+                const messageContent = `target <b>${target_token.data.name}</b> receives <b>${roll2.result.total}`
+                    + `</b> ${dialogParams.meaning}`;
+                await TayiWPConst.saySomething(owner_actor, `${dialogParams.MACRO_NAME}: ${messageContent}`);
+            }, dialogParams);
+        });
     }
 }

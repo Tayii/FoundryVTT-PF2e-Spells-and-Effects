@@ -15,7 +15,9 @@ export default class TayiWPHandlerClass {
     static DIALOG_LEVELS_STATIC = null;
     static ROLL_ITEM = null;
     static USE_REQUIREMENTS = [];
+    static USE_ADDITIONS = [];
     metReqs = [];
+    metAdds = [];
 
     // внутреннее название, для идентификации
     static getHandlerName() {
@@ -70,7 +72,14 @@ export default class TayiWPHandlerClass {
         }
         if (actorReqs.length === 0)
             return null;
-        return new this(actorReqs);
+        const instance = new this(actorReqs);
+        for (const add of this.USE_ADDITIONS) {
+            const answer = add.ifCheck(actor);
+            if (!answer)
+                continue;
+            instance.metAdds.push(answer);
+        }
+        return instance;
     }
 
     constructor(metReqs) {
@@ -106,12 +115,42 @@ export default class TayiWPHandlerClass {
     }
 
     renderReqs(req_num = null, back = false) {
-        if (req_num === null)
-            req_num = 0;
         if (this.metReqs.length === 1 && !back) {
             this.renderDialog(0);
             return;
         }
+        if (req_num === null)
+            req_num = 0;
+        let paramsContent = [];
+
+        for (const i in this.metReqs) {
+            if (!this.metReqs.hasOwnProperty(i))
+                continue;
+            paramsContent.push([i, this.metReqs[i].name]);
+        }
+        paramsContent = TayiWPConst.createOptionParam("reqNum", "method", paramsContent, req_num).text;
+        let applyChanges = false;
+        new Dialog({
+            title: this.getClass().getMacroName(),
+            content: `<form>${paramsContent}</form>`,
+            buttons: {
+                yes: {
+                    icon: "<i class='fas fa-check'></i>",
+                    label: `Continue`,
+                    callback: () => applyChanges = true
+                },
+                no: {
+                    icon: "<i class='fas fa-times'></i>",
+                    label: `Cancel`
+                },
+            },
+            default: "yes",
+            close: async (html) => {
+                if (!applyChanges)
+                    return;
+                (async (self) => self.renderDialog(parseInt(html.find('[name="reqNum"]')[0].value) || req_num))(this);
+            }
+        }).render(true);
     }
 
     renderDialog(req_num, dialogLevel = null) {
@@ -171,11 +210,12 @@ export default class TayiWPHandlerClass {
             default: "yes",
             close: async (html) => {
                 if (cancelDialog) {
-                    this.renderReqs(req_num, true);
+                    (async (self) => self.renderReqs(req_num, true))(this);
                     return;
                 }
                 if (recalculateDialog) {
-                    this.renderDialog(req_num, parseInt(html.find('[name="dialogLevel"]')[0].value) || dialogLevel);
+                    (async (self) => self.renderDialog(req_num,
+                        parseInt(html.find('[name="dialogLevel"]')[0].value) || dialogLevel))(this);
                     return;
                 }
                 if (applyChanges) {
