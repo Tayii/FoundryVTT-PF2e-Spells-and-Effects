@@ -80,29 +80,28 @@ export default class TayiWPHandlerClass {
 
     renderDialog(dialogLevel) {
         let dialogOptionSelected = 0;
-        let dialogLevelOptions = [];
+        let paramsContent = [];
         for (let i = 1; i <= this.DIALOG_LEVEL_MAX; i += 1) {
             if (!this.dialogLevels.hasOwnProperty(i)) {
                 continue;
             }
             if (dialogLevel === i) {
-                dialogOptionSelected = dialogLevelOptions.length;
+                dialogOptionSelected = paramsContent.length;
             }
-            dialogLevelOptions.push([i, `${this.getClass().DIALOG_LEVEL_NAME} ${i}`]);
+            paramsContent.push([i, `${this.getClass().DIALOG_LEVEL_NAME} ${i}`]);
         }
         if (dialogLevel === null) {
-            dialogOptionSelected = dialogLevelOptions.length - 1;
-            dialogLevel = dialogLevelOptions[dialogOptionSelected][0];
+            dialogOptionSelected = paramsContent.length - 1;
+            dialogLevel = paramsContent[dialogOptionSelected][0];
         }
-        dialogLevelOptions = TayiWPConst.createOptionParam("dialogLevel", this.getClass().DIALOG_LEVEL_NAME,
-            dialogLevelOptions, dialogOptionSelected).text;
-        const arr = [];
-        if (this.getClass().ROLL_ITEM !== true) arr.push(['no', 'No']);
-        if (this.getClass().ROLL_ITEM !== false) arr.push(['yes', 'Yes']);
+        paramsContent = TayiWPConst.createOptionParam("dialogLevel", this.getClass().DIALOG_LEVEL_NAME,
+            paramsContent, dialogOptionSelected).text;
+        const showInfoParams = [];
+        if (this.getClass().ROLL_ITEM !== true) showInfoParams.push(['no', 'No']);
+        if (this.getClass().ROLL_ITEM !== false) showInfoParams.push(['yes', 'Yes']);
         const dialogParams = this.dialogLevels[dialogLevel].createParams();
         dialogParams.push(TayiWPConst.createOptionParam('show-info',
-            'Show ' + this.getClass().HANDLER_TYPE.toLowerCase() + ' info in chat?', arr));
-        let paramsContent = '';
+            `Show ${this.getClass().HANDLER_TYPE.toLowerCase()} info in chat?`, showInfoParams));
         for (const i of dialogParams) {
             paramsContent += i.text;
         }
@@ -115,7 +114,6 @@ export default class TayiWPHandlerClass {
             + `click on "Recalculate" button to update other values.<div>
         <hr/>
         <form>
-          ${dialogLevelOptions}
           ${paramsContent}
         </form>
         `,
@@ -147,7 +145,7 @@ export default class TayiWPHandlerClass {
                         if (!dialogParams.hasOwnProperty(i)) {
                             continue;
                         }
-                        dialogParamsAfter[dialogParams[i].name] = html.find('[name="' + dialogParams[i].name + '"]')[0].value;
+                        dialogParamsAfter[dialogParams[i].name] = html.find(`[name="${dialogParams[i].name}"]`)[0].value;
                     }
                     if (dialogParamsAfter['show-info'] === 'yes') {
                         await this.getClass().findActorItem(this.getClass().SUBCLASS_NAME).roll();
