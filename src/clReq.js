@@ -21,6 +21,10 @@ export default class TayiWPReq {
         return this;
     }
 
+    find_subreq(req_type, req_name) {
+        return this.subreqs.find(r => r.type === req_type && r.name === req_name);
+    }
+
     update(dict) {
         for (const key in dict) {
             if (dict.hasOwnProperty(key))
@@ -62,7 +66,9 @@ export default class TayiWPReq {
     ifCheckFeat(actor) {
         const item = TayiWPConst.ifActorItem(this.name, this.type.toLowerCase());
         if (item) {
-            return true;
+            return new TayiWPReq(this.type, this.name, this.level).update({
+                item: item
+            });
         }
         // ui.notifications.error(`You must have the ${this.name} ${this.type.toLowerCase()}.`);
         return false;
@@ -86,8 +92,10 @@ export default class TayiWPReq {
         if (!answer)
             return false;
         for (const subreq of this.subreqs) {
-            if (!subreq.ifCheck(actor))
+            const s = subreq.ifCheck(actor);
+            if (!s)
                 return false;
+            answer.add_subreq(s);
         }
         return answer;
     }

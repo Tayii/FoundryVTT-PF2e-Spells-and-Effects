@@ -115,14 +115,14 @@ export default class TayiWPHandlerClass {
     }
 
     renderReqs(req_num = null, back = false) {
-        if (this.metReqs.length === 1 && !back) {
-            this.renderDialog(0);
+        if (this.metReqs.length === 1) {
+            if (!back)
+                this.renderDialog(0);
             return;
         }
         if (req_num === null)
             req_num = 0;
         let paramsContent = [];
-
         for (const i in this.metReqs) {
             if (!this.metReqs.hasOwnProperty(i))
                 continue;
@@ -180,16 +180,17 @@ export default class TayiWPHandlerClass {
         let applyChanges = false;
         let recalculateDialog = false;
         let cancelDialog = false;
+        let title = this.getClass().getMacroName();
+        if (this.getClass().USE_REQUIREMENTS.length > 1)
+            title += `: ${req.name.toUpperCase()}`;
         new Dialog({
-            title: this.getClass().getMacroName(),
-            content: `
-        <div>If you change ${this.getClass().HANDLER_TYPE.toLowerCase()} ${this.getClass().DIALOG_LEVEL_NAME}, `
-            + `click on "Recalculate" button to update other values.<div>
+            title: title,
+            content: `<div>If you change ${this.getClass().HANDLER_TYPE.toLowerCase()} `
+            + `${this.getClass().DIALOG_LEVEL_NAME}, click on "Recalculate" button to update other values.<div>
         <hr/>
         <form>
           ${paramsContent}
-        </form>
-        `,
+        </form>`,
             buttons: {
                 recalc: {
                     icon: "<i class='fas fa-check'></i>",

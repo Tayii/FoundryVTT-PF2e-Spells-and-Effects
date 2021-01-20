@@ -89,6 +89,9 @@ export default class TayiWPSkillTreatWounds extends TayiWPSkill {
             new TayiWPReq("FEAT", "Natural Medicine")
         )
     ];
+    static USE_ADDITIONS = [
+        new TayiWPReq("FEAT", "Natural Medicine")
+    ];
 
     static getDialogOptionPerLevel(level) {
         return new TayiWPSkillRankTreatWounds(level);
@@ -97,17 +100,15 @@ export default class TayiWPSkillTreatWounds extends TayiWPSkill {
     async dialogCallback(req, dialogParams) {
         const actor = TayiWPConst.ifActor();
         const actionDC = parseInt(dialogParams.dc);
-        const skill = actor.data.data.skills[req.code];
-        // const options = ['secret'];
-        // const events = {"shiftKey": true};
-        skill.roll({}, [], async (roll) => {
-            const wproll = new TayiWPRoll();
-            wproll.result = roll;
-            wproll.vsDC(actionDC);
+        const modifiers = [];
+        if (req.find_subreq("FEAT", "Natural Medicine"))
+            modifiers.push(new PF2Modifier("Natural Medicine", 2, "circumstance"));
+        new TayiWPRoll().skillRoll(actor, req.code, modifiers, async (roll) => {
+            roll.vsDC(actionDC);
             const prof = TayiWPConst.RANK_NAMES[dialogParams.level];
-            const messageContent = `proficiency level <b>${prof}</b>, ${wproll.toString()}`;
+            const messageContent = `proficiency level <b>${prof}</b>, ${roll.toString()}`;
             await TayiWPConst.saySomething(actor, `${dialogParams.MACRO_NAME}: ${messageContent}`);
-            if (!dialogParams.setGrade(wproll.grade) || dialogParams.formula.length === 0) {
+            if (!dialogParams.setGrade(roll.grade) || dialogParams.formula.length === 0) {
                 return;
             }
             const roll2 = new TayiWPRoll(dialogParams.formula).roll({});

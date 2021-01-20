@@ -8,6 +8,26 @@ export default class TayiWPRoll {
         this.grade = null;
     }
 
+    skillRoll(actor, skill_code, mods, callback) {
+        const self = this;
+        const label = game.i18n.format('PF2E.SkillCheckWithName', {
+            skillName: game.i18n.localize(CONFIG.PF2E.skills[skill_code]),
+        });
+        const event = {};
+        if (mods.length > 0)
+            event["shiftKey"] = true;
+        const modifiers = new PF2CheckModifier(label, actor.data.data.skills[skill_code]);
+        for (const i of mods) {
+            modifiers.push(i);
+        }
+        const options = [];
+        // options.push('secret');
+        PF2Check.roll(modifiers, { actor: actor, type: 'skill-check', options }, event, async (roll) => {
+            self.result = roll;
+            await callback(self);
+        });
+    }
+
     roll(data) {
         this.result = new Roll(this.formula, data).roll();
         return this;
