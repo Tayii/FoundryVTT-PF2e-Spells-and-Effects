@@ -79,49 +79,39 @@ export default class TayiWPHandlerClass {
     }
 
     renderDialog(dialogLevel) {
-        if (!dialogLevel) {
-            dialogLevel = this.DIALOG_LEVEL_MAX;
-        }
-        let dialogLevelOptions = ``;
+        let dialogLevelOptions = [];
         for (let i = 1; i <= this.DIALOG_LEVEL_MAX; i += 1) {
             if (!this.dialogLevels.hasOwnProperty(i)) {
                 continue;
             }
-            dialogLevelOptions += `<option `;
-            if (i === dialogLevel) {
-                dialogLevelOptions += `selected `;
-            }
-            dialogLevelOptions += `value="` + i +`">` + this.getClass().DIALOG_LEVEL_NAME + ' ' + i + `</option>`;
+            dialogLevelOptions.push([i, `${this.getClass().DIALOG_LEVEL_NAME} ${i}`]);
         }
-        const dialogParams = this.dialogLevels[dialogLevel].createParams();
+        if (dialogLevel === null) {
+            dialogLevel = dialogLevelOptions[dialogLevelOptions.length - 1][0];
+        }
+        dialogLevelOptions = TayiWPConst.createOptionParam("dialogLevel", this.getClass().DIALOG_LEVEL_NAME,
+            dialogLevelOptions, dialogLevel - 1).text;
         const arr = [];
         if (this.getClass().ROLL_ITEM !== true) arr.push(['no', 'No']);
         if (this.getClass().ROLL_ITEM !== false) arr.push(['yes', 'Yes']);
+        const dialogParams = this.dialogLevels[dialogLevel].createParams();
         dialogParams.push(TayiWPConst.createOptionParam('show-info',
             'Show ' + this.getClass().HANDLER_TYPE.toLowerCase() + ' info in chat?', arr));
         let paramsContent = '';
-        for (let i in dialogParams) {
-            if (!dialogParams.hasOwnProperty(i)) {
-                continue;
-            }
-            paramsContent += dialogParams[i].text;
+        for (const i of dialogParams) {
+            paramsContent += i.text;
         }
         let applyChanges = false;
         let recalculateDialog = false;
         new Dialog({
             title: this.getClass().getMacroName(),
             content: `
-        <div>If you change ` + this.getClass().HANDLER_TYPE.toLowerCase() + ` ` + this.getClass().DIALOG_LEVEL_NAME
-            + `, click on "Recalculate" button to update other values.<div>
+        <div>If you change ${this.getClass().HANDLER_TYPE.toLowerCase()} ${this.getClass().DIALOG_LEVEL_NAME}, `
+            + `click on "Recalculate" button to update other values.<div>
         <hr/>
         <form>
-          <div class="form-group">
-            <label>` + this.getClass().DIALOG_LEVEL_NAME + `:</label>
-            <select id="dialogLevel" name="dialogLevel">
-              ` + dialogLevelOptions + `
-            </select>
-          </div>
-          ` + paramsContent + `
+          ${dialogLevelOptions}
+          ${paramsContent}
         </form>
         `,
             buttons: {

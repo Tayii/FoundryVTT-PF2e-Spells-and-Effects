@@ -97,9 +97,7 @@ export default class TayiWPConst {
             if (!values.hasOwnProperty(i)) {
                 continue;
             }
-            let selected = "";
-            if (i === selected_val)
-                selected = "selected";
+            const selected = (parseInt(i) === selected_val) ? "selected" : "";
             selectContent += `<option value="${values[i][0]}" ${selected}>${values[i][1]}</option>`;
         }
         const x = this.createBorders();
