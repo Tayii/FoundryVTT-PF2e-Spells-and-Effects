@@ -13,8 +13,8 @@ export default class TayiWPHandlerClass {
     static DIALOG_LEVEL_SCALING = 1;
     static DIALOG_LEVELS_STATIC = null;
     static ROLL_ITEM = null;
-    DIALOG_LEVEL_MAX = 1;
-    dialogLevels = {};
+    static USE_REQUIREMENTS = [];
+    metReqs = [];
 
     // внутреннее название, для идентификации
     static getHandlerName() {
@@ -30,27 +30,55 @@ export default class TayiWPHandlerClass {
         return `${this.getClass().SUBCLASS_NAME} (lvl ${level})`
     }
 
+    getClass() {
+        return this.constructor;
+    }
+
     static getCallbackMessage() {
     }
 
     static handleMessage(message, html, data, chat_card, effect_data) {
     }
 
-    static create() {
-
+    async dialogCallback(dialogParams) {
     }
 
-    getClass() {
-        return this.constructor;
+    static alertCreate(args) {
+    }
+
+    static getDialogOptionPerLevel(level) {
+    }
+
+    static init(args) {
+        if (args.length === 0) {
+            return this.create().renderReqs();
+        }
+        else {
+            return this.alertCreate(args);
+        }
+    }
+
+    static create() {
+        const actor = TayiWPConst.ifActor();
+        const actorReqs = [];
+        for (const req of this.USE_REQUIREMENTS) {
+            const answer = req.ifCheck(actor);
+            if (!answer)
+                continue;
+            actorReqs.push(answer);
+        }
+        if (actorReqs.length === 0)
+            return null;
+        return new this(actorReqs);
+    }
+
+    constructor(metReqs) {
+        this.metReqs = metReqs;
     }
 
     static findActorItem(name) {
-        const item = TayiWPConst.findActorItem(name, this.HANDLER_TYPE.toLowerCase());
-        if (item) {
-            return item;
-        }
-        ui.notifications.error(`You must have the ${name} ${this.HANDLER_TYPE.toLowerCase()}.`);
-        return false;
+        const item = TayiWPConst.ifActorItem(name, this.HANDLER_TYPE.toLowerCase());
+        return (item) ? item : null;
     }
 
     static getDialogLevels(level_max) {
@@ -69,10 +97,6 @@ export default class TayiWPHandlerClass {
         return levels;
     }
 
-    static getDialogOptionPerLevel(level) {
-
-    }
-
     static getDialogOption(level_wanted) {
         const levels_found = this.getDialogLevels(level_wanted);
         if (levels_found.length > 0)
@@ -80,16 +104,22 @@ export default class TayiWPHandlerClass {
         return null;
     }
 
-    renderDialog(dialogLevel) {
+    renderReqs(req_num = null, back = false) {
+        if (req_num === null)
+            req_num = 0;
+        if (this.metReqs.length === 1 && !back) {
+            this.renderDialog(0);
+            return;
+        }
+    }
+
+    renderDialog(req_num, dialogLevel = null) {
+        const req = this.metReqs[req_num][this.getClass().HANDLER_TYPE][this.getClass().SUBCLASS_NAME];
         let dialogOptionSelected = 0;
         let paramsContent = [];
-        for (let i = 1; i <= this.DIALOG_LEVEL_MAX; i += 1) {
-            if (!this.dialogLevels.hasOwnProperty(i)) {
-                continue;
-            }
-            if (dialogLevel === i) {
+        for (const i of this.getClass().getDialogLevels(req.level)) {
+            if (dialogLevel === i)
                 dialogOptionSelected = paramsContent.length;
-            }
             paramsContent.push([i, `${this.getClass().DIALOG_LEVEL_NAME} ${i}`]);
         }
         if (dialogLevel === null) {
@@ -101,7 +131,7 @@ export default class TayiWPHandlerClass {
         const showInfoParams = [];
         if (this.getClass().ROLL_ITEM !== true) showInfoParams.push(['no', 'No']);
         if (this.getClass().ROLL_ITEM !== false) showInfoParams.push(['yes', 'Yes']);
-        const dialogParams = this.dialogLevels[dialogLevel].createParams();
+        const dialogParams = this.getClass().getDialogOption(dialogLevel).createParams();
         dialogParams.push(TayiWPConst.createOptionParam('show-info',
             `Show ${this.getClass().HANDLER_TYPE.toLowerCase()} info in chat?`, showInfoParams));
         for (const i of dialogParams) {
@@ -109,6 +139,7 @@ export default class TayiWPHandlerClass {
         }
         let applyChanges = false;
         let recalculateDialog = false;
+        let cancelDialog = false;
         new Dialog({
             title: this.getClass().getMacroName(),
             content: `
@@ -132,13 +163,18 @@ export default class TayiWPHandlerClass {
                 },
                 no: {
                     icon: "<i class='fas fa-times'></i>",
-                    label: `Cancel`
+                    label: `Cancel`,
+                    callback: () => cancelDialog = true
                 },
             },
             default: "yes",
             close: async (html) => {
+                if (cancelDialog) {
+                    this.renderReqs(req_num, true);
+                    return;
+                }
                 if (recalculateDialog) {
-                    this.renderDialog(parseInt(html.find('[name="dialogLevel"]')[0].value) || dialogLevel);
+                    this.renderDialog(req_num, parseInt(html.find('[name="dialogLevel"]')[0].value) || dialogLevel);
                     return;
                 }
                 if (applyChanges) {
@@ -146,9 +182,8 @@ export default class TayiWPHandlerClass {
                     for (let i of dialogParams) {
                         dialogParamsAfter[i.name] = html.find(`[name="${i.name}"]`)[0].value;
                     }
-                    if (dialogParamsAfter['show-info'] === 'yes') {
+                    if (dialogParamsAfter['show-info'] === 'yes')
                         await this.getClass().findActorItem(this.getClass().SUBCLASS_NAME).roll();
-                    }
                     dialogParamsAfter.source_actor_id = TayiWPConst.ifActor()._id;
                     dialogParamsAfter.SUBCLASS_NAME = this.getClass().SUBCLASS_NAME;
                     dialogParamsAfter.HANDLER_NAME = this.getClass().getHandlerName();
@@ -157,26 +192,5 @@ export default class TayiWPHandlerClass {
                 }
             }
         }).render(true);
-    }
-
-    async dialogCallback(dialogParamsAfter) {
-
-    }
-
-    static alertCreate(args) {
-
-    }
-
-    constructor() {
-
-    }
-
-    static init(args) {
-        if (args.length === 0) {
-            return this.create();
-        }
-        else {
-            return this.alertCreate(args);
-        }
     }
 }

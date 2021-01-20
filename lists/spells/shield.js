@@ -3,6 +3,7 @@ import TayiWPSpell from "../../categories/clSpell.js";
 import TayiWPSpellLevel from "../../categories/clSpellLevel.js";
 import TayiWP from "../../src/base.js";
 import TayiWPFlagsClass from "../../src/clFlags.js";
+import TayiWPReq from "../../categories/clReq.js";
 
 class TayiWPSpellAttributesShield extends TayiWPSpellLevel {
     compendiumName = 'pf2e.equipment-srd';
@@ -22,6 +23,9 @@ class TayiWPSpellAttributesShield extends TayiWPSpellLevel {
 export default class TayiWPSpellShield extends TayiWPSpell {
     static SUBCLASS_NAME = 'Shield';
     static DIALOG_LEVEL_SCALING = 2;
+    static USE_REQUIREMENTS = [
+        new TayiWPReq("SPELL", "Shield", 1)
+    ];
 
     static getDialogOptionPerLevel(level) {
         const attr = new TayiWPSpellAttributesShield(level);
@@ -29,17 +33,9 @@ export default class TayiWPSpellShield extends TayiWPSpell {
         return attr;
     }
 
-    static create() {
-        const instance = super.create();
-        if (instance) {
-            return instance.renderDialog(instance.DIALOG_LEVEL_MAX);
-        }
-    }
-
     static alertCreate(args) {
         const instance = super.create();
         if (instance) {
-            // return instance.createEffectButton(args[0]);
             instance.removeEffect(args[0]);
         }
     }

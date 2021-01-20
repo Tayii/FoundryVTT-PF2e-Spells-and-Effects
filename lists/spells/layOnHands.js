@@ -3,6 +3,7 @@ import TayiWPSpell from "../../categories/clSpell.js";
 import TayiWPSpellLevel from "../../categories/clSpellLevel.js";
 import TayiWP from "../../src/base.js";
 import TayiWPFlagsClass from "../../src/clFlags.js";
+import TayiWPReq from "../../categories/clReq.js";
 
 class TayiWPSpellAttributesLayOnHands extends TayiWPSpellLevel {
     spell_target = 'ally';
@@ -24,23 +25,23 @@ class TayiWPSpellAttributesLayOnHands extends TayiWPSpellLevel {
 export default class TayiWPSpellLayOnHands extends TayiWPSpell {
     static SUBCLASS_NAME = 'Lay on Hands';
     static ROLL_ITEM = false;
+    static USE_REQUIREMENTS = [
+        new TayiWPReq("SPELL", "Lay on Hands", 1).add_subreq(
+            new TayiWPReq("SPELL", "Lay on Hands (ally)", 1)
+        )
+    ];
 
-    static getDialogOptionPerLevel(level) {
-        const attr = new TayiWPSpellAttributesLayOnHands(level);
-        return attr;
+    static getCallbackMessage() {
+        return this;
     }
 
-    static create() {
-        const instance = super.create();
-        if (instance) {
-            return instance.renderDialog(instance.DIALOG_LEVEL_MAX);
-        }
+    static getDialogOptionPerLevel(level) {
+        return new TayiWPSpellAttributesLayOnHands(level);
     }
 
     static alertCreate(args) {
         const instance = super.create();
         if (instance) {
-            // return instance.createEffectButton(args[0]);
             const self = instance.getClass();
             TayiWPConst.forEachAffectedToken(async (current_actor, actor, token, spellParams) => {
                 self.removeEffectPerToken(actor, token, spellParams);
@@ -75,10 +76,6 @@ export default class TayiWPSpellLayOnHands extends TayiWPSpell {
         await TayiWP.postChatButtonEffect(this.getFullName(spellParams.level), effectDesc, spellParams);
     }
 
-    static getCallbackMessage() {
-        return this;
-    }
-
     static handleMessage(message, html, data, chat_card, effect_data) {
         const self = this;
         TayiWPConst.createButton(chat_card, "Apply effect", this.buttonClickApplyEffect, effect_data);
@@ -92,6 +89,8 @@ export default class TayiWPSpellLayOnHands extends TayiWPSpell {
     static async buttonClickApplyEffect(spellParams) {
         const modName = `${spellParams.SUBCLASS_NAME} (${spellParams.spell_target})`;
         await TayiWPConst.forEachControlledToken(async (actor, token, spellParams) => {
+            if (TayiWPConst.ifActorHasModifier(actor, 'ac', modName))
+                return;
             let messageContent = 'status AC';
             switch (spellParams.spell_target) {
                 case 'ally':
@@ -118,8 +117,7 @@ export default class TayiWPSpellLayOnHands extends TayiWPSpell {
 
     static async removeEffectPerToken(actor, token, spellParams) {
         const modName = `${spellParams.SUBCLASS_NAME} (${spellParams.spell_target})`;
-        if (!(actor.data.data.customModifiers.hasOwnProperty('ac')
-            && actor.data.data.customModifiers['ac'].find(cm => cm.name === modName)))
+        if (!TayiWPConst.ifActorHasModifier(actor, 'ac', modName))
             return;
         actor.removeCustomModifier('ac', modName);
         let messageContent = 'status AC';
@@ -133,7 +131,6 @@ export default class TayiWPSpellLayOnHands extends TayiWPSpell {
             case 'undead':
                 messageContent = `loses -${spellParams.ac_penalty} ${messageContent}`;
         }
-        // TayiWPFlagsClass.remove(spellParams, actor, token);
         await TayiWPConst.saySomething(actor, `${spellParams.MACRO_NAME}: ${messageContent}`);
     }
 }

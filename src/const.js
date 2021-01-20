@@ -172,17 +172,20 @@ export default class TayiWPConst {
         }
     }
 
-    static findActorItem(itemName, itemType) {
+    static ifActorItem(itemName, itemType) {
         const actor = this.ifActor();
         if (!actor) {
-            return;
+            return false;
         }
         let item = actor.data.items
             .filter(item => item.type === itemType)
             .find(item => item.name === itemName);
-        if (item) {
-            return actor.getOwnedItem(item._id);
-        }
+        return (item) ? actor.getOwnedItem(item._id) : false;
+    }
+
+    static ifActorHasModifier(actor, mod_type, mod_name) {
+        return (actor.data.data.customModifiers.hasOwnProperty(mod_type)
+            && actor.data.data.customModifiers[mod_type].find(cm => cm.name === mod_name));
     }
 
     static async saySomething(actor, messageContent) {
