@@ -71,23 +71,21 @@ export default class TayiWPConst {
         return [
             {
                 name: '__BORDER__',
-                text: `
-          <div class="form-group">`
+                text: `<div class="form-group">`
             },
             {
                 name: '__BORDER__',
-                text: `
-          </div>`
+                text: `</div>`
             }
         ];
     }
 
     static createParamShort(name, label, ptype, value) {
+        value = (value !== undefined) ? `value="${value}"` : ``;
         return {
             name: name,
-            text: `
-            <label>` + label + `</label>
-            <input id="` + name + `" name="` + name + `" type="` + ptype + `" value="` + value + `"/>`
+            text: `<label>${label}</label>
+            <input id="${name}" name="${name}" type="${ptype}" ${value}/>`
         };
     }
 

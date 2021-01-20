@@ -49,7 +49,7 @@ export default class TayiWPSpellLayOnHands extends TayiWPSpell {
         }
     }
 
-    async dialogCallback(req, dialogParams) {
+    async dialogCallback(req, additions, dialogParams) {
         let name = dialogParams.SUBCLASS_NAME;
         if (dialogParams.spell_target === 'ally')
             name += ' (' + dialogParams.spell_target + ')';

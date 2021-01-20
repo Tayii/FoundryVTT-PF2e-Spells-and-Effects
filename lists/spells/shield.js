@@ -43,7 +43,7 @@ export default class TayiWPSpellShield extends TayiWPSpell {
         }
     }
 
-    async dialogCallback(req, dialogParams) {
+    async dialogCallback(req, additions, dialogParams) {
         const actor = TayiWPConst.ifActor();
         await this.applyEffect(dialogParams);
         dialogParams['EXPIRED'] = true;

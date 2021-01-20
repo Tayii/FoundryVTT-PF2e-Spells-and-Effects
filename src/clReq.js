@@ -16,6 +16,10 @@ export default class TayiWPReq {
         this.level = level;
     }
 
+    getHandlerName() {
+        return `${this.type}_${this.name}`.toLowerCase().replace(' ', '_');
+    }
+
     add_subreq(subreq) {
         this.subreqs.push(subreq);
         return this;

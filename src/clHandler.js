@@ -43,7 +43,7 @@ export default class TayiWPHandlerClass {
     static handleMessage(message, html, data, chat_card, effect_data) {
     }
 
-    async dialogCallback(req, dialogParams) {
+    async dialogCallback(req, additions, dialogParams) {
     }
 
     static alertCreate(args) {
@@ -129,6 +129,8 @@ export default class TayiWPHandlerClass {
             paramsContent.push([i, this.metReqs[i].name]);
         }
         paramsContent = TayiWPConst.createOptionParam("reqNum", "method", paramsContent, req_num).text;
+        for (const r of this.metAdds)
+            paramsContent += TayiWPConst.createParam(r.getHandlerName(), r.name + '?', "checkbox").text;
         let applyChanges = false;
         new Dialog({
             title: this.getClass().getMacroName(),
@@ -148,12 +150,18 @@ export default class TayiWPHandlerClass {
             close: async (html) => {
                 if (!applyChanges)
                     return;
-                (async (self) => self.renderDialog(parseInt(html.find('[name="reqNum"]')[0].value) || req_num))(this);
+                const req_num_after = parseInt(html.find('[name="reqNum"]')[0].value) || req_num;
+                const adds = [];
+                for (const r of this.metAdds) {
+                    if (html.find(`[name="${r.getHandlerName()}"]`)[0].checked)
+                        adds.push(r);
+                }
+                (async (self) => self.renderDialog(req_num_after, adds))(this);
             }
         }).render(true);
     }
 
-    renderDialog(req_num, dialogLevel = null) {
+    renderDialog(req_num, additions, dialogLevel = null) {
         const req = this.metReqs[req_num];
         let dialogOptionSelected = 0;
         let paramsContent = [];
@@ -215,7 +223,7 @@ export default class TayiWPHandlerClass {
                     return;
                 }
                 if (recalculateDialog) {
-                    (async (self) => self.renderDialog(req_num,
+                    (async (self) => self.renderDialog(req_num, additions,
                         parseInt(html.find('[name="dialogLevel"]')[0].value) || dialogLevel))(this);
                     return;
                 }
@@ -230,7 +238,7 @@ export default class TayiWPHandlerClass {
                     dialogParamsAfter.SUBCLASS_NAME = this.getClass().SUBCLASS_NAME;
                     dialogParamsAfter.HANDLER_NAME = this.getClass().getHandlerName();
                     dialogParamsAfter.MACRO_NAME = this.getClass().getMacroName();
-                    await this.dialogCallback(req, dialogParamsAfter);
+                    await this.dialogCallback(req, additions, dialogParamsAfter);
                 }
             }
         }).render(true);

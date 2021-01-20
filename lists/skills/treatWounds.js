@@ -90,14 +90,16 @@ export default class TayiWPSkillTreatWounds extends TayiWPSkill {
         )
     ];
     static USE_ADDITIONS = [
-        new TayiWPReq("FEAT", "Natural Medicine")
+        // new TayiWPReq("FEAT", "Risky Surgery").add_subreq(
+        //     new TayiWPReq("SKILL", "medicine", 1)
+        // )
     ];
 
     static getDialogOptionPerLevel(level) {
         return new TayiWPSkillRankTreatWounds(level);
     }
 
-    async dialogCallback(req, dialogParams) {
+    async dialogCallback(req, additions, dialogParams) {
         const actor = TayiWPConst.ifActor();
         const actionDC = parseInt(dialogParams.dc);
         const modifiers = [];
