@@ -1,0 +1,81 @@
+import TayiWPConst from "./const.js";
+
+export default class TayiWPReq {
+    type = '';
+    name = '';
+    level = 1;
+    subreqs = [];
+
+    // code = '';
+    // value = 0;
+
+    constructor(type, name, level) {
+        this.type = type;
+        this.name = name;
+        this.level = level;
+    }
+
+    add_subreq(subreq) {
+        this.subreqs.push(subreq);
+        return this;
+    }
+
+    update(dict) {
+        for (const key in dict) {
+            if (dict.hasOwnProperty(key))
+                this[key] = dict[key];
+        }
+        return this;
+    }
+
+    ifCheckSpell(actor) {
+        const item = TayiWPConst.ifActorItem(this.name, this.type.toLowerCase());
+        if (!item) {
+            ui.notifications.error(`You must have the ${this.name} ${this.type.toLowerCase()}.`);
+            return false;
+        }
+        const actorSpellLevel = TayiWPConst.getSPELL_LEVEL(actor.level);
+        if (this.level <= actorSpellLevel)
+            return new TayiWPReq(this.type, this.name, actorSpellLevel);
+        return false;
+    }
+
+    ifSkillCheck(actor) {
+        for (const skill_code in actor.data.data.skills) {
+            if (!actor.data.data.skills.hasOwnProperty(skill_code)) {
+                continue;
+            }
+            const skill = actor.data.data.skills[skill_code];
+            if (this.name === skill.name && this.level <= skill.rank) {
+                return new TayiWPReq(this.type, this.name, skill.rank).update({
+                    code: skill_code,
+                    value: skill.value
+                });
+            }
+        }
+        const rank_name = TayiWPConst.RANK_NAMES[this.level];
+        ui.notifications.error(`You must be at least ${rank_name} in the ${this.name} ${this.type.toLowerCase()}.`);
+        return false;
+    }
+
+    ifCheck(actor) {
+        let answer;
+        switch (this.type) {
+            case "SPELL":
+                answer = this.ifCheckSpell(actor);
+                break;
+            case "SKILL":
+                answer = this.ifSkillCheck(actor);
+                break;
+            default:
+                break;
+        }
+        if (!answer)
+            return false;
+        for (const subreq of this.subreqs) {
+            if (!subreq.ifCheck(actor))
+                return false;
+        }
+        return answer;
+    }
+}

@@ -72,6 +72,8 @@ export default class TayiWP {
 
     static registerCallback(callbackClass) {
         const callbackName = callbackClass.getHandlerName();
+        if (!callbackName)
+            return;
         TayiWP.HANDLERS_MESSAGE[callbackName] = callbackClass.getCallbackMessage();
     }
 

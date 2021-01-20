@@ -3,7 +3,7 @@ import TayiWPSpell from "../../categories/clSpell.js";
 import TayiWPSpellLevel from "../../categories/clSpellLevel.js";
 import TayiWP from "../../src/base.js";
 import TayiWPFlagsClass from "../../src/clFlags.js";
-import TayiWPReq from "../../categories/clReq.js";
+import TayiWPReq from "../../src/clReq.js";
 
 class TayiWPSpellAttributesShield extends TayiWPSpellLevel {
     compendiumName = 'pf2e.equipment-srd';
@@ -11,6 +11,11 @@ class TayiWPSpellAttributesShield extends TayiWPSpellLevel {
     shieldName = 'Magical Shield of Force';
     ac_bonus = 1;
     hardness = 5;
+
+    constructor(level) {
+        super(level);
+        this.hardness = 5 + (level - 1) / 2 * 5;
+    }
 
     createParams() {
         return [
@@ -28,9 +33,7 @@ export default class TayiWPSpellShield extends TayiWPSpell {
     ];
 
     static getDialogOptionPerLevel(level) {
-        const attr = new TayiWPSpellAttributesShield(level);
-        attr.hardness = 5 + (level - this.DIALOG_LEVEL_MIN) / 2 * 5;
-        return attr;
+        return new TayiWPSpellAttributesShield(level);
     }
 
     static alertCreate(args) {
@@ -40,12 +43,12 @@ export default class TayiWPSpellShield extends TayiWPSpell {
         }
     }
 
-    async dialogCallback(spellParams) {
+    async dialogCallback(req, dialogParams) {
         const actor = TayiWPConst.ifActor();
-        await this.applyEffect(spellParams);
-        spellParams['EXPIRED'] = true;
-        await TayiWP.whenNextTurn(TayiWPConst.COMBAT_TRIGGERS.TURN_START, actor.data._id, 1, spellParams.MACRO_NAME,
-            [spellParams]);
+        await this.applyEffect(dialogParams);
+        dialogParams['EXPIRED'] = true;
+        await TayiWP.whenNextTurn(TayiWPConst.COMBAT_TRIGGERS.TURN_START, actor.data._id, 1, dialogParams.MACRO_NAME,
+            [dialogParams]);
     }
 
     // async createEffectButton(spellParams) {
@@ -61,56 +64,56 @@ export default class TayiWPSpellShield extends TayiWPSpell {
         // TayiWPConst.createButton(chat_card, "Remove effect", this.buttonClickRemoveEffect, effect_data);
     // }
 
-    async applyEffect(spellParams) {
-        spellParams.ac_bonus = parseInt(spellParams.ac_bonus);
-        spellParams.hardness = parseInt(spellParams.hardness);
-        const pack = game.packs.get(spellParams.compendiumName);
+    async applyEffect(dialogParams) {
+        dialogParams.ac_bonus = parseInt(dialogParams.ac_bonus);
+        dialogParams.hardness = parseInt(dialogParams.hardness);
+        const pack = game.packs.get(dialogParams.compendiumName);
         const index = await pack.getIndex();
-        const entry = index.find(e => e.name === spellParams.shieldNameBefore);
+        const entry = index.find(e => e.name === dialogParams.shieldNameBefore);
         const item = await pack.getEntity(entry._id);
-        await TayiWPConst.forEachControlledToken(async (actor, token, spellParams) => {
+        await TayiWPConst.forEachControlledToken(async (actor, token, dialogParams) => {
             const shield = await actor.createOwnedItem(item.data);
             await actor.updateEmbeddedEntity("OwnedItem", [{
                 "_id": shield._id,
                 "data.hp.value": 1,
                 "data.maxHp.value": 1,
-                "data.armor.value": spellParams.ac_bonus,
-                "data.hardness.value": spellParams.hardness,
+                "data.armor.value": dialogParams.ac_bonus,
+                "data.hardness.value": dialogParams.hardness,
                 "data.brokenThreshold.value": 0,
-                "name": `${spellParams.shieldName} (lvl ${spellParams.level})`,
+                "name": `${dialogParams.shieldName} (lvl ${dialogParams.level})`,
                 "img": "systems/pf2e/icons/spells/shield.jpg",
                 "data.equipped.value": true,
             }]);
-            await actor.addCustomModifier('ac', `Raise Shield (${spellParams.shieldName})`, spellParams.ac_bonus,
+            await actor.addCustomModifier('ac', `Raise Shield (${dialogParams.shieldName})`, dialogParams.ac_bonus,
                 'circumstance');
             token.toggleEffect("systems/pf2e/icons/spells/shield.jpg", {
                 "active": true
             });
-            TayiWPFlagsClass.affect(spellParams, actor, token);
-            const messageContent = `creates shield with AC <b>${spellParams.ac_bonus}`
-                + `</b> and Hardness <b>${spellParams.hardness}</b>`;
-            await TayiWPConst.saySomething(actor, `${spellParams.MACRO_NAME}: ${messageContent}`);
-        }, spellParams);
+            TayiWPFlagsClass.affect(dialogParams, actor, token);
+            const messageContent = `creates shield with AC <b>${dialogParams.ac_bonus}`
+                + `</b> and Hardness <b>${dialogParams.hardness}</b>`;
+            await TayiWPConst.saySomething(actor, `${dialogParams.MACRO_NAME}: ${messageContent}`);
+        }, dialogParams);
     }
 
-    async removeEffect(spellParams) {
-        await TayiWPConst.forEachAffectedToken(async (current_actor, actor, token, spellParams) => {
+    async removeEffect(dialogParams) {
+        await TayiWPConst.forEachAffectedToken(async (current_actor, actor, token, dialogParams) => {
             let shield = actor.data.items
                 .filter(item => item.type === 'armor')
                 .filter(armor => armor.data.armorType.value === 'shield')
-                .find(shield => shield.name.startsWith(spellParams.shieldName));
+                .find(shield => shield.name.startsWith(dialogParams.shieldName));
 
-            await actor.removeCustomModifier('ac', `Raise Shield (${spellParams.shieldName})`);
+            await actor.removeCustomModifier('ac', `Raise Shield (${dialogParams.shieldName})`);
             token.toggleEffect("systems/pf2e/icons/spells/shield.jpg", {
                 "active": false
             });
-            let messageContent = `dismisses ${spellParams.SUBCLASS_NAME} cantrip`;
+            let messageContent = `dismisses ${dialogParams.SUBCLASS_NAME} cantrip`;
             if (shield.data.hp.value < shield.data.maxHp.value) {
-                messageContent += `; ${spellParams.SUBCLASS_NAME} can't be used for 10 minutes`
+                messageContent += `; ${dialogParams.SUBCLASS_NAME} can't be used for 10 minutes`
             }
             await actor.deleteEmbeddedEntity('OwnedItem', shield._id);
-            TayiWPFlagsClass.remove(spellParams, actor, token);
-            await TayiWPConst.saySomething(actor, `${spellParams.MACRO_NAME}: ${messageContent}`);
-        }, spellParams);
+            TayiWPFlagsClass.remove(dialogParams, actor, token);
+            await TayiWPConst.saySomething(actor, `${dialogParams.MACRO_NAME}: ${messageContent}`);
+        }, dialogParams);
     }
 }

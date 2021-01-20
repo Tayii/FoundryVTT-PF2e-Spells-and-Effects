@@ -3,7 +3,7 @@ import TayiWPSpell from "../../categories/clSpell.js";
 import TayiWPSpellLevel from "../../categories/clSpellLevel.js";
 import TayiWP from "../../src/base.js";
 import TayiWPFlagsClass from "../../src/clFlags.js";
-import TayiWPReq from "../../categories/clReq.js";
+import TayiWPReq from "../../src/clReq.js";
 
 class TayiWPSpellAttributesLayOnHands extends TayiWPSpellLevel {
     spell_target = 'ally';
@@ -49,74 +49,74 @@ export default class TayiWPSpellLayOnHands extends TayiWPSpell {
         }
     }
 
-    async dialogCallback(spellParams) {
-        let name = spellParams.SUBCLASS_NAME;
-        if (spellParams.spell_target === 'ally')
-            name += ' (' + spellParams.spell_target + ')';
+    async dialogCallback(req, dialogParams) {
+        let name = dialogParams.SUBCLASS_NAME;
+        if (dialogParams.spell_target === 'ally')
+            name += ' (' + dialogParams.spell_target + ')';
         await TayiWPSpell.findActorItem(name).roll();
-        switch (spellParams.spell_target) {
+        switch (dialogParams.spell_target) {
             case 'ally':
-                spellParams.ac_bonus = parseInt(spellParams.ac_bonus);
+                dialogParams.ac_bonus = parseInt(dialogParams.ac_bonus);
                 break;
             case 'undead':
-                spellParams.ac_penalty = parseInt(spellParams.ac_penalty);
+                dialogParams.ac_penalty = parseInt(dialogParams.ac_penalty);
         }
-        await this.createEffectButton(spellParams);
+        await this.createEffectButton(dialogParams);
     }
 
-    async createEffectButton(spellParams) {
+    async createEffectButton(dialogParams) {
         let effectDesc = 'status AC, 1 round';
-        switch (spellParams.spell_target) {
+        switch (dialogParams.spell_target) {
             case 'ally':
-                effectDesc = `+${spellParams.ac_bonus} ${effectDesc}`;
+                effectDesc = `+${dialogParams.ac_bonus} ${effectDesc}`;
                 break;
             case 'undead':
-                effectDesc = `-${spellParams.ac_penalty} ${effectDesc}`;
+                effectDesc = `-${dialogParams.ac_penalty} ${effectDesc}`;
         }
-        await TayiWP.postChatButtonEffect(this.getFullName(spellParams.level), effectDesc, spellParams);
+        await TayiWP.postChatButtonEffect(this.getFullName(dialogParams.level), effectDesc, dialogParams);
     }
 
     static handleMessage(message, html, data, chat_card, effect_data) {
         const self = this;
         TayiWPConst.createButton(chat_card, "Apply effect", this.buttonClickApplyEffect, effect_data);
-        TayiWPConst.createButton(chat_card, "Remove effect", async (spellParams) => {
-            await TayiWPConst.forEachControlledToken(async (actor, token, spellParams) => {
-                self.removeEffectPerToken(actor, token, spellParams);
-            }, spellParams);
+        TayiWPConst.createButton(chat_card, "Remove effect", async (dialogParams) => {
+            await TayiWPConst.forEachControlledToken(async (actor, token, dialogParams) => {
+                self.removeEffectPerToken(actor, token, dialogParams);
+            }, dialogParams);
         }, effect_data);
     }
 
-    static async buttonClickApplyEffect(spellParams) {
-        const modName = `${spellParams.SUBCLASS_NAME} (${spellParams.spell_target})`;
-        await TayiWPConst.forEachControlledToken(async (actor, token, spellParams) => {
+    static async buttonClickApplyEffect(dialogParams) {
+        const modName = `${dialogParams.SUBCLASS_NAME} (${dialogParams.spell_target})`;
+        await TayiWPConst.forEachControlledToken(async (actor, token, dialogParams) => {
             if (TayiWPConst.ifActorHasModifier(actor, 'ac', modName))
                 return;
             let messageContent = 'status AC';
-            switch (spellParams.spell_target) {
+            switch (dialogParams.spell_target) {
                 case 'ally':
                     token.toggleEffect("systems/pf2e/icons/spells/lay-on-hands.jpg", {
                         "active": true
                     });
-                    actor.addCustomModifier('ac', modName, spellParams.ac_bonus, 'status');
-                    messageContent = `gains +${spellParams.ac_bonus} ${messageContent}`;
+                    actor.addCustomModifier('ac', modName, dialogParams.ac_bonus, 'status');
+                    messageContent = `gains +${dialogParams.ac_bonus} ${messageContent}`;
                     break;
                 case 'undead':
                     token.toggleEffect("systems/pf2e/icons/spells/lay-on-hands.jpg", {
                         "active": true
                     });
-                    actor.addCustomModifier('ac', modName, -spellParams.ac_penalty, 'status');
-                    messageContent = `takes -${spellParams.ac_penalty} ${messageContent}`;
+                    actor.addCustomModifier('ac', modName, -dialogParams.ac_penalty, 'status');
+                    messageContent = `takes -${dialogParams.ac_penalty} ${messageContent}`;
             }
-            TayiWPFlagsClass.affect(spellParams, actor, token);
-            await TayiWPConst.saySomething(actor, `${spellParams.MACRO_NAME}: ${messageContent}`);
-            spellParams['EXPIRED'] = true;
-            await TayiWP.whenNextTurn(TayiWPConst.COMBAT_TRIGGERS.TURN_START, spellParams.source_actor_id, 1,
-                spellParams.MACRO_NAME, [spellParams]);
-        }, spellParams);
+            TayiWPFlagsClass.affect(dialogParams, actor, token);
+            await TayiWPConst.saySomething(actor, `${dialogParams.MACRO_NAME}: ${messageContent}`);
+            dialogParams['EXPIRED'] = true;
+            await TayiWP.whenNextTurn(TayiWPConst.COMBAT_TRIGGERS.TURN_START, dialogParams.source_actor_id, 1,
+                dialogParams.MACRO_NAME, [dialogParams]);
+        }, dialogParams);
     }
 
-    static async removeEffectPerToken(actor, token, spellParams) {
-        const modName = `${spellParams.SUBCLASS_NAME} (${spellParams.spell_target})`;
+    static async removeEffectPerToken(actor, token, dialogParams) {
+        const modName = `${dialogParams.SUBCLASS_NAME} (${dialogParams.spell_target})`;
         if (!TayiWPConst.ifActorHasModifier(actor, 'ac', modName))
             return;
         actor.removeCustomModifier('ac', modName);
@@ -124,13 +124,13 @@ export default class TayiWPSpellLayOnHands extends TayiWPSpell {
         token.toggleEffect("systems/pf2e/icons/spells/lay-on-hands.jpg", {
             "active": false
         });
-        switch (spellParams.spell_target) {
+        switch (dialogParams.spell_target) {
             case 'ally':
-                messageContent = `loses +${spellParams.ac_bonus} ${messageContent}`;
+                messageContent = `loses +${dialogParams.ac_bonus} ${messageContent}`;
                 break;
             case 'undead':
-                messageContent = `loses -${spellParams.ac_penalty} ${messageContent}`;
+                messageContent = `loses -${dialogParams.ac_penalty} ${messageContent}`;
         }
-        await TayiWPConst.saySomething(actor, `${spellParams.MACRO_NAME}: ${messageContent}`);
+        await TayiWPConst.saySomething(actor, `${dialogParams.MACRO_NAME}: ${messageContent}`);
     }
 }

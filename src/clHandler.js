@@ -9,6 +9,7 @@ export default class TayiWPHandlerClass {
     static MACRO_ACTION = '';
     // название каждого уровня скалирования (уровень, мастерство, и т.д.)
     static DIALOG_LEVEL_NAME = '';
+    static DIALOG_LEVEL_VALUE = (level) => `${level}`;
     static DIALOG_LEVEL_MIN = 1;
     static DIALOG_LEVEL_SCALING = 1;
     static DIALOG_LEVELS_STATIC = null;
@@ -40,7 +41,7 @@ export default class TayiWPHandlerClass {
     static handleMessage(message, html, data, chat_card, effect_data) {
     }
 
-    async dialogCallback(dialogParams) {
+    async dialogCallback(req, dialogParams) {
     }
 
     static alertCreate(args) {
@@ -114,13 +115,13 @@ export default class TayiWPHandlerClass {
     }
 
     renderDialog(req_num, dialogLevel = null) {
-        const req = this.metReqs[req_num][this.getClass().HANDLER_TYPE][this.getClass().SUBCLASS_NAME];
+        const req = this.metReqs[req_num];
         let dialogOptionSelected = 0;
         let paramsContent = [];
         for (const i of this.getClass().getDialogLevels(req.level)) {
             if (dialogLevel === i)
                 dialogOptionSelected = paramsContent.length;
-            paramsContent.push([i, `${this.getClass().DIALOG_LEVEL_NAME} ${i}`]);
+            paramsContent.push([i, this.getClass().DIALOG_LEVEL_VALUE(i)]);
         }
         if (dialogLevel === null) {
             dialogOptionSelected = paramsContent.length - 1;
@@ -188,7 +189,7 @@ export default class TayiWPHandlerClass {
                     dialogParamsAfter.SUBCLASS_NAME = this.getClass().SUBCLASS_NAME;
                     dialogParamsAfter.HANDLER_NAME = this.getClass().getHandlerName();
                     dialogParamsAfter.MACRO_NAME = this.getClass().getMacroName();
-                    await this.dialogCallback(dialogParamsAfter);
+                    await this.dialogCallback(req, dialogParamsAfter);
                 }
             }
         }).render(true);
