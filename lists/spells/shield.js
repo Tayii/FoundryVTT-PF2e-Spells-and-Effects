@@ -21,10 +21,9 @@ class TayiWPSpellAttributesShield extends TayiWPSpellLevel {
 
 export default class TayiWPSpellShield extends TayiWPSpell {
     static SUBCLASS_NAME = 'Shield';
-    static DIALOG_LEVEL_MIN = 1;
-    static DIALOG_SCALING = 2;
+    static DIALOG_LEVEL_SCALING = 2;
 
-    static getDialogLevelsPerLevel(level) {
+    static getDialogOptionPerLevel(level) {
         const attr = new TayiWPSpellAttributesShield(level);
         attr.hardness = 5 + (level - this.DIALOG_LEVEL_MIN) / 2 * 5;
         return attr;
@@ -81,12 +80,14 @@ export default class TayiWPSpellShield extends TayiWPSpell {
                 "data.maxHp.value": 1,
                 "data.armor.value": spellParams.ac_bonus,
                 "data.hardness.value": spellParams.hardness,
+                "data.brokenThreshold.value": 0,
                 "name": `${spellParams.shieldName} (lvl ${spellParams.level})`,
+                "img": "systems/pf2e/icons/spells/shield.jpg",
                 "data.equipped.value": true,
             }]);
             await actor.addCustomModifier('ac', `Raise Shield (${spellParams.shieldName})`, spellParams.ac_bonus,
                 'circumstance');
-            token.toggleEffect("systems/pf2e/icons/conditions-2/status_acup.png", {
+            token.toggleEffect("systems/pf2e/icons/spells/shield.jpg", {
                 "active": true
             });
             TayiWPFlagsClass.affect(spellParams, actor, token);
@@ -104,7 +105,7 @@ export default class TayiWPSpellShield extends TayiWPSpell {
                 .find(shield => shield.name.startsWith(spellParams.shieldName));
 
             await actor.removeCustomModifier('ac', `Raise Shield (${spellParams.shieldName})`);
-            token.toggleEffect("systems/pf2e/icons/conditions-2/status_acup.png", {
+            token.toggleEffect("systems/pf2e/icons/spells/shield.jpg", {
                 "active": false
             });
             let messageContent = `dismisses ${spellParams.SUBCLASS_NAME} cantrip`;

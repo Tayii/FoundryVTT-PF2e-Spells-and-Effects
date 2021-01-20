@@ -10,14 +10,15 @@ export default class TayiWPHandlerClass {
     // название каждого уровня скалирования (уровень, мастерство, и т.д.)
     static DIALOG_LEVEL_NAME = '';
     static DIALOG_LEVEL_MIN = 1;
-    static DIALOG_SCALING = 1;
+    static DIALOG_LEVEL_SCALING = 1;
+    static DIALOG_LEVELS_STATIC = null;
     static ROLL_ITEM = null;
     DIALOG_LEVEL_MAX = 1;
     dialogLevels = {};
 
     // внутреннее название, для идентификации
     static getHandlerName() {
-        return this.HANDLER_TYPE.toUpperCase() + '_' + this.SUBCLASS_NAME.toUpperCase().replace(' ', '_');
+        return `${this.HANDLER_TYPE}_${this.SUBCLASS_NAME}`.toUpperCase().replace(' ', '_');
     }
 
     // общее название, для визуального отображения
@@ -26,7 +27,7 @@ export default class TayiWPHandlerClass {
     }
 
     getFullName(level) {
-        return this.getClass().SUBCLASS_NAME + ' (lvl ' + level + ')'
+        return `${this.getClass().SUBCLASS_NAME} (lvl ${level})`
     }
 
     static getCallbackMessage() {
@@ -48,33 +49,34 @@ export default class TayiWPHandlerClass {
         if (item) {
             return item;
         }
-        ui.notifications.error("You must have " + name + " " + this.HANDLER_TYPE.toLowerCase() + ".");
+        ui.notifications.error(`You must have the ${name} ${this.HANDLER_TYPE.toLowerCase()}.`);
         return false;
     }
 
     static getDialogLevels(level_max) {
-        const attrs = {};
-        for (let i = this.DIALOG_LEVEL_MIN; i <= level_max; i += this.DIALOG_SCALING) {
-            const a = this.getDialogLevelsPerLevel(i);
-            if (a !== null) {
-                attrs[i] = a;
+        const levels = [];
+        if (this.DIALOG_LEVELS_STATIC === null) {
+            for (let i = this.DIALOG_LEVEL_MIN; i <= level_max; i += this.DIALOG_LEVEL_SCALING)
+                levels.push(i);
+        }
+        else {
+            for (let i of this.DIALOG_LEVELS_STATIC) {
+                if (i > level_max)
+                    break;
+                levels.push(i);
             }
         }
-        return attrs
+        return levels;
     }
 
-    static getDialogLevelsPerLevel(level) {
+    static getDialogOptionPerLevel(level) {
 
     }
 
-    static getDialogLevel(level) {
-        const levels = this.getDialogLevels(level);
-        while (level >= this.DIALOG_LEVEL_MIN && !levels.hasOwnProperty(level)) {
-            level--;
-        }
-        if (levels.hasOwnProperty(level)) {
-            return levels[level];
-        }
+    static getDialogOption(level_wanted) {
+        const levels_found = this.getDialogLevels(level_wanted);
+        if (levels_found.length > 0)
+            return this.getDialogOptionPerLevel(levels_found[levels_found.length - 1]);
         return null;
     }
 
@@ -125,7 +127,7 @@ export default class TayiWPHandlerClass {
                 },
                 yes: {
                     icon: "<i class='fas fa-check'></i>",
-                    label: this.getClass().MACRO_ACTION + ` ` + this.getClass().HANDLER_TYPE.toLowerCase(),
+                    label: `${this.getClass().MACRO_ACTION} ${this.getClass().HANDLER_TYPE.toLowerCase()}`,
                     callback: () => applyChanges = true
                 },
                 no: {
@@ -140,12 +142,9 @@ export default class TayiWPHandlerClass {
                     return;
                 }
                 if (applyChanges) {
-                    const dialogParamsAfter = this.getClass().getDialogLevel(dialogLevel);
-                    for (let i in dialogParams) {
-                        if (!dialogParams.hasOwnProperty(i)) {
-                            continue;
-                        }
-                        dialogParamsAfter[dialogParams[i].name] = html.find(`[name="${dialogParams[i].name}"]`)[0].value;
+                    const dialogParamsAfter = this.getClass().getDialogOption(dialogLevel);
+                    for (let i of dialogParams) {
+                        dialogParamsAfter[i.name] = html.find(`[name="${i.name}"]`)[0].value;
                     }
                     if (dialogParamsAfter['show-info'] === 'yes') {
                         await this.getClass().findActorItem(this.getClass().SUBCLASS_NAME).roll();

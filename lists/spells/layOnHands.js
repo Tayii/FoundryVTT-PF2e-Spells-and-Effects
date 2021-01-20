@@ -23,10 +23,9 @@ class TayiWPSpellAttributesLayOnHands extends TayiWPSpellLevel {
 
 export default class TayiWPSpellLayOnHands extends TayiWPSpell {
     static SUBCLASS_NAME = 'Lay on Hands';
-    static DIALOG_LEVEL_MIN = 1;
     static ROLL_ITEM = false;
 
-    static getDialogLevelsPerLevel(level) {
+    static getDialogOptionPerLevel(level) {
         const attr = new TayiWPSpellAttributesLayOnHands(level);
         return attr;
     }
@@ -91,49 +90,50 @@ export default class TayiWPSpellLayOnHands extends TayiWPSpell {
     }
 
     static async buttonClickApplyEffect(spellParams) {
-        const name = spellParams.SUBCLASS_NAME + ' (' + spellParams.spell_target + ')';
+        const modName = `${spellParams.SUBCLASS_NAME} (${spellParams.spell_target})`;
         await TayiWPConst.forEachControlledToken(async (actor, token, spellParams) => {
             let messageContent = 'status AC';
             switch (spellParams.spell_target) {
                 case 'ally':
-                    token.toggleEffect("systems/pf2e/icons/conditions-2/status_acup.png", {
+                    token.toggleEffect("systems/pf2e/icons/spells/lay-on-hands.jpg", {
                         "active": true
                     });
-                    actor.addCustomModifier('ac', name, spellParams.ac_bonus, 'status');
+                    actor.addCustomModifier('ac', modName, spellParams.ac_bonus, 'status');
                     messageContent = `gains +${spellParams.ac_bonus} ${messageContent}`;
                     break;
                 case 'undead':
-                    token.toggleEffect("systems/pf2e/icons/conditions-2/broken.png", {
+                    token.toggleEffect("systems/pf2e/icons/spells/lay-on-hands.jpg", {
                         "active": true
                     });
-                    actor.addCustomModifier('ac', name, -spellParams.ac_penalty, 'status');
+                    actor.addCustomModifier('ac', modName, -spellParams.ac_penalty, 'status');
                     messageContent = `takes -${spellParams.ac_penalty} ${messageContent}`;
             }
             TayiWPFlagsClass.affect(spellParams, actor, token);
             await TayiWPConst.saySomething(actor, `${spellParams.MACRO_NAME}: ${messageContent}`);
-            // spellParams['EXPIRED'] = true;
+            spellParams['EXPIRED'] = true;
             await TayiWP.whenNextTurn(TayiWPConst.COMBAT_TRIGGERS.TURN_START, spellParams.source_actor_id, 1,
                 spellParams.MACRO_NAME, [spellParams]);
         }, spellParams);
     }
 
     static async removeEffectPerToken(actor, token, spellParams) {
-        actor.removeCustomModifier('ac', `${spellParams.SUBCLASS_NAME} (${spellParams.spell_target})`);
+        const modName = `${spellParams.SUBCLASS_NAME} (${spellParams.spell_target})`;
+        if (!(actor.data.data.customModifiers.hasOwnProperty('ac')
+            && actor.data.data.customModifiers['ac'].find(cm => cm.name === modName)))
+            return;
+        actor.removeCustomModifier('ac', modName);
         let messageContent = 'status AC';
+        token.toggleEffect("systems/pf2e/icons/spells/lay-on-hands.jpg", {
+            "active": false
+        });
         switch (spellParams.spell_target) {
             case 'ally':
-                token.toggleEffect("systems/pf2e/icons/conditions-2/status_acup.png", {
-                    "active": false
-                });
                 messageContent = `loses +${spellParams.ac_bonus} ${messageContent}`;
                 break;
             case 'undead':
-                token.toggleEffect("systems/pf2e/icons/conditions-2/broken.png", {
-                    "active": false
-                });
                 messageContent = `loses -${spellParams.ac_penalty} ${messageContent}`;
         }
-        TayiWPFlagsClass.remove(spellParams, actor, token);
+        // TayiWPFlagsClass.remove(spellParams, actor, token);
         await TayiWPConst.saySomething(actor, `${spellParams.MACRO_NAME}: ${messageContent}`);
     }
 }

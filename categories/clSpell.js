@@ -9,11 +9,14 @@ export default class TayiWPSpell extends TayiWPHandlerClass {
     static create() {
         const actor = TayiWPConst.ifActor();
         const actorSpellLevel = TayiWPConst.getSPELL_LEVEL(actor.level);
-        if (actorSpellLevel < this.DIALOG_LEVEL_MIN)
+        if (this.getDialogOption(actorSpellLevel) === null)
             return null;
         const instance = new this();
-        instance.DIALOG_LEVEL_MAX = TayiWPConst.getSPELL_LEVEL(actor.level);
-        instance.dialogLevels = this.getDialogLevels(instance.DIALOG_LEVEL_MAX);
+        instance.DIALOG_LEVEL_MAX = actorSpellLevel;
+        instance.dialogLevels = {};
+        for (const l of this.getDialogLevels(instance.DIALOG_LEVEL_MAX)) {
+            instance.dialogLevels[l] = this.getDialogOptionPerLevel(l);
+        }
         return instance;
     }
 }
