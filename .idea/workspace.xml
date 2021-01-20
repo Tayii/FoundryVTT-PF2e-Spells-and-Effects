@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e60f8325-0996-4542-aacb-f193aa4f4423" name="Default" comment="">
+    <list default="true" id="e60f8325-0996-4542-aacb-f193aa4f4423" name="Default" comment="v1.1.3&#10;fixed minor errors">
       <change afterPath="$PROJECT_DIR$/categories/clReq.js" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/categories/clSkillGrade.js" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/categories/clSkillRank.js" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/lists/skills.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lists/spells.js" beforeDir="false" afterPath="$PROJECT_DIR$/lists/spells.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/clHandler.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/clHandler.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/const.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/const.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -24,7 +21,7 @@
       <file leaf-file-name="layOnHands.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lists/spells/layOnHands.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
+            <state relative-caret-position="107">
               <caret line="27" lean-forward="true" selection-start-line="27" selection-end-line="27" />
               <folding>
                 <element signature="e#0#45#0" expanded="true" />
@@ -48,8 +45,17 @@
       <file leaf-file-name="clHandler.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/clHandler.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="269">
-              <caret line="151" column="62" lean-forward="true" selection-start-line="151" selection-start-column="62" selection-end-line="151" selection-end-column="62" />
+            <state relative-caret-position="341">
+              <caret line="91" column="9" lean-forward="true" selection-start-line="91" selection-start-column="9" selection-end-line="91" selection-end-column="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="const.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/const.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="365">
+              <caret line="99" column="29" selection-start-line="99" selection-start-column="29" selection-end-line="99" selection-end-column="29" />
             </state>
           </provider>
         </entry>
@@ -305,7 +311,7 @@
       <workItem from="1610865472380" duration="19566000" />
       <workItem from="1610953754346" duration="20489000" />
       <workItem from="1611143241587" duration="1523000" />
-      <workItem from="1611144775412" duration="9878000" />
+      <workItem from="1611144775412" duration="11694000" />
     </task>
     <task id="LOCAL-00001" summary="-1.1.0&#10;major rewrites">
       <created>1610959263586</created>
@@ -328,11 +334,25 @@
       <option name="project" value="LOCAL" />
       <updated>1610977914180</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="v1.1.3&#10;fixed minor errors">
+      <created>1611155723284</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1611155723284</updated>
+    </task>
+    <task id="LOCAL-00005" summary="v1.1.4&#10;fixes">
+      <created>1611157137664</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1611157137664</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="77742000" />
+    <option name="totallyTimeSpent" value="79558000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="72" y="475" width="1646" height="965" extended-state="0" />
@@ -347,7 +367,7 @@
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32848486" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="7" />
+      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32969698" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -381,7 +401,9 @@
     <MESSAGE value="-1.1.0&#10;major rewrites" />
     <MESSAGE value="v1.1.1&#10;added spell: Shield&#10;added forEachAffectedToken()" />
     <MESSAGE value="v1.1.2&#10;added affected_ids" />
-    <option name="LAST_COMMIT_MESSAGE" value="v1.1.2&#10;added affected_ids" />
+    <MESSAGE value="v1.1.3&#10;fixed minor errors" />
+    <MESSAGE value="v1.1.4&#10;fixes" />
+    <option name="LAST_COMMIT_MESSAGE" value="v1.1.4&#10;fixes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -649,23 +671,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/const.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="575">
-          <caret line="113" column="5" lean-forward="true" selection-start-line="113" selection-start-column="5" selection-end-line="113" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lists/spells/layOnHands.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="27" lean-forward="true" selection-start-line="27" selection-end-line="27" />
-          <folding>
-            <element signature="e#0#45#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lists/spells.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="216">
@@ -696,10 +701,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/lists/spells/layOnHands.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="107">
+          <caret line="27" lean-forward="true" selection-start-line="27" selection-end-line="27" />
+          <folding>
+            <element signature="e#0#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/const.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="365">
+          <caret line="99" column="29" selection-start-line="99" selection-start-column="29" selection-end-line="99" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/clHandler.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="151" column="62" lean-forward="true" selection-start-line="151" selection-start-column="62" selection-end-line="151" selection-end-column="62" />
+        <state relative-caret-position="341">
+          <caret line="91" column="9" lean-forward="true" selection-start-line="91" selection-start-column="9" selection-end-line="91" selection-end-column="9" />
         </state>
       </provider>
     </entry>

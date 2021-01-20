@@ -79,18 +79,23 @@ export default class TayiWPHandlerClass {
     }
 
     renderDialog(dialogLevel) {
+        let dialogOptionSelected = 0;
         let dialogLevelOptions = [];
         for (let i = 1; i <= this.DIALOG_LEVEL_MAX; i += 1) {
             if (!this.dialogLevels.hasOwnProperty(i)) {
                 continue;
             }
+            if (dialogLevel === i) {
+                dialogOptionSelected = dialogLevelOptions.length;
+            }
             dialogLevelOptions.push([i, `${this.getClass().DIALOG_LEVEL_NAME} ${i}`]);
         }
         if (dialogLevel === null) {
-            dialogLevel = dialogLevelOptions[dialogLevelOptions.length - 1][0];
+            dialogOptionSelected = dialogLevelOptions.length - 1;
+            dialogLevel = dialogLevelOptions[dialogOptionSelected][0];
         }
         dialogLevelOptions = TayiWPConst.createOptionParam("dialogLevel", this.getClass().DIALOG_LEVEL_NAME,
-            dialogLevelOptions, dialogLevel - 1).text;
+            dialogLevelOptions, dialogOptionSelected).text;
         const arr = [];
         if (this.getClass().ROLL_ITEM !== true) arr.push(['no', 'No']);
         if (this.getClass().ROLL_ITEM !== false) arr.push(['yes', 'Yes']);
