@@ -1,9 +1,12 @@
 import TayiWPSpellLayOnHands from "./spells/layOnHands.js";
 import TayiWPSpellShield from "./spells/shield.js";
+import TayiWPSpellKiRush from "./spells/kiRush.js";
 
 const l = [
-    TayiWPSpellLayOnHands,
     TayiWPSpellShield,
+
+    TayiWPSpellLayOnHands,
+    TayiWPSpellKiRush,
 ];
 const TAYIWP_SPELLS = {};
 for (const _class of l) {

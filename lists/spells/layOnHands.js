@@ -35,7 +35,7 @@ export default class TayiWPSpellLayOnHands extends TayiWPSpell {
     }
 
     static alertCreate(args) {
-        const instance = super.create();
+        const instance = new this([]);
         if (instance) {
             const self = instance.getClass();
             TayiWPConst.forEachAffectedToken(async (current_actor, actor, token, spellParams) => {

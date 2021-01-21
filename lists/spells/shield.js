@@ -32,7 +32,7 @@ export default class TayiWPSpellShield extends TayiWPSpell {
     }
 
     static alertCreate(args) {
-        const instance = super.create();
+        const instance = new this([]);
         if (instance) {
             instance.removeEffect(args[0]);
         }
@@ -95,7 +95,6 @@ export default class TayiWPSpellShield extends TayiWPSpell {
                 .filter(item => item.type === 'armor')
                 .filter(armor => armor.data.armorType.value === 'shield')
                 .find(shield => shield.name.startsWith(dialogParams.shieldName));
-
             await actor.removeCustomModifier('ac', `Raise Shield (${dialogParams.shieldName})`);
             token.toggleEffect("systems/pf2e/icons/spells/shield.jpg", {
                 "active": false
@@ -105,7 +104,6 @@ export default class TayiWPSpellShield extends TayiWPSpell {
                 messageContent += `; ${dialogParams.SUBCLASS_NAME} can't be used for 10 minutes`
             }
             await actor.deleteEmbeddedEntity('OwnedItem', shield._id);
-            TayiWPFlagsClass.remove(dialogParams, actor, token);
             await TayiWPConst.saySomething(actor, `${dialogParams.MACRO_NAME}: ${messageContent}`);
         }, dialogParams);
     }

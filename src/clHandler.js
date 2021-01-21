@@ -14,6 +14,7 @@ export default class TayiWPHandlerClass {
     static DIALOG_LEVEL_MIN = 1;
     static DIALOG_LEVEL_SCALING = 1;
     static DIALOG_LEVELS_STATIC = null;
+    static DIALOG_SKIP = false;
     static ROLL_ITEM = null;
     static USE_REQUIREMENTS = [];
     static USE_ADDITIONS = [];
@@ -116,9 +117,9 @@ export default class TayiWPHandlerClass {
     }
 
     renderReqs(req_num = null, back = false) {
-        if (this.metReqs.length === 1) {
+        if (this.metReqs.length === 1 && this.metAdds.length === 0) {
             if (!back)
-                this.renderDialog(0);
+                this.renderDialog(0, []);
             return;
         }
         if (req_num === null)
@@ -184,6 +185,17 @@ export default class TayiWPHandlerClass {
         const dialogParams = req.apply_patch("rank", this.getClass().getDialogLevel(dialogLevel));
         const contentParams = paramDialogLevels.createTextInput()
             + dialogParams.createTextInputs() + paramShowInfo.createTextInput();
+        if (this.getClass().DIALOG_SKIP) {
+            dialogParams.spliceParams();
+            if (paramShowInfo.splice()[1] === 'yes')
+                this.getClass().findActorItem(this.getClass().SUBCLASS_NAME).roll();
+            dialogParams.source_actor_id = TayiWPConst.ifActor()._id;
+            dialogParams.SUBCLASS_NAME = this.getClass().SUBCLASS_NAME;
+            dialogParams.HANDLER_NAME = this.getClass().getHandlerName();
+            dialogParams.MACRO_NAME = this.getClass().getMacroName();
+            this.dialogCallback(req, dialogParams);
+            return;
+        }
         let applyChanges = false;
         let recalculateDialog = false;
         let cancelDialog = false;
