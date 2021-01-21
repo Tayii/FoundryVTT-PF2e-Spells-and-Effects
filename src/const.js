@@ -60,33 +60,15 @@ export default class TayiWPConst {
         return Math.ceil(actor_level / 2);
     }
 
-    static createParam(name, label, ptype, value) {
-        const x = this.createParamShort(name, label, ptype, value);
-        const y = this.createBorders();
-        x.text = y[0].text + x.text + y[1].text;
-        return x;
-    }
-
     static createBorders() {
-        return [
-            {
-                name: '__BORDER__',
-                text: `<div class="form-group">`
-            },
-            {
-                name: '__BORDER__',
-                text: `</div>`
-            }
-        ];
+        return [`<div class="form-group">`, `</div>`];
     }
 
-    static createParamShort(name, label, ptype, value) {
+    static createParam(name, label, ptype, value) {
         value = (value !== undefined) ? `value="${value}"` : ``;
-        return {
-            name: name,
-            text: `<label>${label}</label>
-            <input id="${name}" name="${name}" type="${ptype}" ${value}/>`
-        };
+        const x = this.createBorders();
+        return `${x[0]}<label>${label}</label>
+            <input id="${name}" name="${name}" type="${ptype}" ${value}/>${x[1]}`;
     }
 
     static createOptionParam(name, label, values, selected_val = 0) {
@@ -99,14 +81,10 @@ export default class TayiWPConst {
             selectContent += `<option value="${values[i][0]}" ${selected}>${values[i][1]}</option>`;
         }
         const x = this.createBorders();
-        return {
-            name: name,
-            text: x[0].text + `
-            <label>${label}</label>
+        return `${x[0]}<label>${label}</label>
             <select id="${name}" name="${name}">
                 ${selectContent}
-            </select>` + x[1].text
-        };
+            </select>${x[1]}`;
     }
 
     static ifActor() {

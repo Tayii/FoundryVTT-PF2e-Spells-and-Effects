@@ -1,4 +1,5 @@
 import TayiWPConst from "./const.js";
+import TayiWPDialogParam from "./clDialogParam.js";
 
 export default class TayiWPHandlerClass {
     // для разделения между категориями подклассов (заклинания, навыки, черты, и т.д.)
@@ -107,7 +108,7 @@ export default class TayiWPHandlerClass {
         return levels;
     }
 
-    static getDialogOption(level_wanted) {
+    static getDialogLevel(level_wanted) {
         const levels_found = this.getDialogLevels(level_wanted);
         if (levels_found.length > 0)
             return this.getDialogOptionPerLevel(levels_found[levels_found.length - 1]);
@@ -122,15 +123,19 @@ export default class TayiWPHandlerClass {
         }
         if (req_num === null)
             req_num = 0;
-        let paramsContent = [];
+        const paramReqNum = new TayiWPDialogParam("reqNum", "method", "options");
         for (const i in this.metReqs) {
             if (!this.metReqs.hasOwnProperty(i))
                 continue;
-            paramsContent.push([i, this.metReqs[i].name]);
+            paramReqNum.addOptionValue(i, this.metReqs[i].name, i === req_num);
         }
-        paramsContent = TayiWPConst.createOptionParam("reqNum", "method", paramsContent, req_num).text;
-        for (const r of this.metAdds)
-            paramsContent += TayiWPConst.createParam(r.getHandlerName(), r.name + '?', "checkbox").text;
+        let paramsContent = paramReqNum.createTextInput();
+        const paramsAdditions = {};
+        for (const addition of this.metAdds) {
+            const additionParam = new TayiWPDialogParam(addition.getHandlerName(), addition.name + "?", "checkbox");
+            paramsAdditions[addition.getHandlerName()] = additionParam;
+            paramsContent += additionParam.createTextInput();
+        }
         let applyChanges = false;
         new Dialog({
             title: this.getClass().getMacroName(),
@@ -150,41 +155,35 @@ export default class TayiWPHandlerClass {
             close: async (html) => {
                 if (!applyChanges)
                     return;
-                const req_num_after = parseInt(html.find('[name="reqNum"]')[0].value) || req_num;
-                const adds = [];
-                for (const r of this.metAdds) {
-                    if (html.find(`[name="${r.getHandlerName()}"]`)[0].checked)
-                        adds.push(r);
+                req_num = paramReqNum.findInputParam(html);
+                const actualAdditions = [];
+                for (const addition of this.metAdds) {
+                    if (paramsAdditions[addition.getHandlerName()].findInputParam(html))
+                        actualAdditions.push(addition);
                 }
-                (async (self) => self.renderDialog(req_num_after, adds))(this);
+                (async (self) => self.renderDialog(req_num, actualAdditions))(this);
             }
         }).render(true);
     }
 
     renderDialog(req_num, additions, dialogLevel = null) {
         const req = this.metReqs[req_num];
-        let dialogOptionSelected = 0;
-        let paramsContent = [];
-        for (const i of this.getClass().getDialogLevels(req.level)) {
-            if (dialogLevel === i)
-                dialogOptionSelected = paramsContent.length;
-            paramsContent.push([i, this.getClass().DIALOG_LEVEL_VALUE(i)]);
+        req.additions = additions;
+        let levels = this.getClass().getDialogLevels(req.level);
+        if (dialogLevel === null)
+            dialogLevel = levels[levels.length - 1];
+        const paramDialogLevels = new TayiWPDialogParam("dialogLevel", this.getClass().DIALOG_LEVEL_NAME,
+            "options");
+        for (const i of levels) {
+            paramDialogLevels.addOptionValue(i, this.getClass().DIALOG_LEVEL_VALUE(i), i === dialogLevel);
         }
-        if (dialogLevel === null) {
-            dialogOptionSelected = paramsContent.length - 1;
-            dialogLevel = paramsContent[dialogOptionSelected][0];
-        }
-        paramsContent = TayiWPConst.createOptionParam("dialogLevel", this.getClass().DIALOG_LEVEL_NAME,
-            paramsContent, dialogOptionSelected).text;
-        const showInfoParams = [];
-        if (this.getClass().ROLL_ITEM !== true) showInfoParams.push(['no', 'No']);
-        if (this.getClass().ROLL_ITEM !== false) showInfoParams.push(['yes', 'Yes']);
-        const dialogParams = this.getClass().getDialogOption(dialogLevel).createParams();
-        dialogParams.push(TayiWPConst.createOptionParam('show-info',
-            `Show ${this.getClass().HANDLER_TYPE.toLowerCase()} info in chat?`, showInfoParams));
-        for (const i of dialogParams) {
-            paramsContent += i.text;
-        }
+        const paramShowInfo = new TayiWPDialogParam('show-info',
+            `Show ${this.getClass().HANDLER_TYPE.toLowerCase()} info in chat?`, "options");
+        if (this.getClass().ROLL_ITEM !== true) paramShowInfo.addOptionValue('no', 'No');
+        if (this.getClass().ROLL_ITEM !== false) paramShowInfo.addOptionValue('yes', 'Yes');
+        const dialogParams = req.apply_patch("rank", this.getClass().getDialogLevel(dialogLevel));
+        const contentParams = paramDialogLevels.createTextInput()
+            + dialogParams.createTextInputs() + paramShowInfo.createTextInput();
         let applyChanges = false;
         let recalculateDialog = false;
         let cancelDialog = false;
@@ -197,7 +196,7 @@ export default class TayiWPHandlerClass {
             + `${this.getClass().DIALOG_LEVEL_NAME}, click on "Recalculate" button to update other values.<div>
         <hr/>
         <form>
-          ${paramsContent}
+          ${contentParams}
         </form>`,
             buttons: {
                 recalc: {
@@ -224,21 +223,18 @@ export default class TayiWPHandlerClass {
                 }
                 if (recalculateDialog) {
                     (async (self) => self.renderDialog(req_num, additions,
-                        parseInt(html.find('[name="dialogLevel"]')[0].value) || dialogLevel))(this);
+                        parseInt(paramDialogLevels.findInputParam(html))))(this);
                     return;
                 }
                 if (applyChanges) {
-                    const dialogParamsAfter = this.getClass().getDialogOption(dialogLevel);
-                    for (let i of dialogParams) {
-                        dialogParamsAfter[i.name] = html.find(`[name="${i.name}"]`)[0].value;
-                    }
-                    if (dialogParamsAfter['show-info'] === 'yes')
+                    dialogParams.findInputParams(html).spliceParams();
+                    if (paramShowInfo.findInputParam(html) === 'yes')
                         await this.getClass().findActorItem(this.getClass().SUBCLASS_NAME).roll();
-                    dialogParamsAfter.source_actor_id = TayiWPConst.ifActor()._id;
-                    dialogParamsAfter.SUBCLASS_NAME = this.getClass().SUBCLASS_NAME;
-                    dialogParamsAfter.HANDLER_NAME = this.getClass().getHandlerName();
-                    dialogParamsAfter.MACRO_NAME = this.getClass().getMacroName();
-                    await this.dialogCallback(req, additions, dialogParamsAfter);
+                    dialogParams.source_actor_id = TayiWPConst.ifActor()._id;
+                    dialogParams.SUBCLASS_NAME = this.getClass().SUBCLASS_NAME;
+                    dialogParams.HANDLER_NAME = this.getClass().getHandlerName();
+                    dialogParams.MACRO_NAME = this.getClass().getMacroName();
+                    await this.dialogCallback(req, dialogParams);
                 }
             }
         }).render(true);

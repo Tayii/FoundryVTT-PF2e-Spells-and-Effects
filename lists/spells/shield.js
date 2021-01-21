@@ -4,24 +4,19 @@ import TayiWPSpellLevel from "../../categories/clSpellLevel.js";
 import TayiWP from "../../src/base.js";
 import TayiWPFlagsClass from "../../src/clFlags.js";
 import TayiWPReq from "../../src/clReq.js";
+import TayiWPDialogParam from "../../src/clDialogParam.js";
 
 class TayiWPSpellAttributesShield extends TayiWPSpellLevel {
     compendiumName = 'pf2e.equipment-srd';
     shieldNameBefore = 'Buckler';
     shieldName = 'Magical Shield of Force';
-    ac_bonus = 1;
-    hardness = 5;
+    params = [
+        new TayiWPDialogParam('ac_bonus', 'AC Bonus', 'number', 1),
+    ];
 
     constructor(level) {
         super(level);
-        this.hardness = 5 + (level - 1) / 2 * 5;
-    }
-
-    createParams() {
-        return [
-            TayiWPConst.createParam('ac_bonus', 'AC Bonus', 'number', this.ac_bonus),
-            TayiWPConst.createParam('hardness', 'Hardness', 'number', this.hardness)
-        ]
+        this.addParam(new TayiWPDialogParam('hardness', 'Hardness', 'number', 5 + 5 * (level - 1) / 2))
     }
 }
 
@@ -43,7 +38,7 @@ export default class TayiWPSpellShield extends TayiWPSpell {
         }
     }
 
-    async dialogCallback(req, additions, dialogParams) {
+    async dialogCallback(req, dialogParams) {
         const actor = TayiWPConst.ifActor();
         await this.applyEffect(dialogParams);
         dialogParams['EXPIRED'] = true;
@@ -65,8 +60,6 @@ export default class TayiWPSpellShield extends TayiWPSpell {
     // }
 
     async applyEffect(dialogParams) {
-        dialogParams.ac_bonus = parseInt(dialogParams.ac_bonus);
-        dialogParams.hardness = parseInt(dialogParams.hardness);
         const pack = game.packs.get(dialogParams.compendiumName);
         const index = await pack.getIndex();
         const entry = index.find(e => e.name === dialogParams.shieldNameBefore);

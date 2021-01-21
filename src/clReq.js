@@ -5,7 +5,9 @@ export default class TayiWPReq {
     name = '';
     level = 1;
     subreqs = [];
+    additions = [];
     sort_value = 0;
+    patches = {};
 
     // code = '';
     // value = 0;
@@ -25,8 +27,23 @@ export default class TayiWPReq {
         return this;
     }
 
-    find_subreq(req_type, req_name) {
-        return this.subreqs.find(r => r.type === req_type && r.name === req_name);
+    find_add(add_name) {
+        return this.additions.find(a => a.name === add_name);
+    }
+
+    add_patch(patch_type, patch_callback) {
+        this.patches[patch_type] = patch_callback;
+        return this;
+    }
+
+    apply_patch(patch_type, obj) {
+        if (this.patches.hasOwnProperty(patch_type))
+            obj = this.patches[patch_type](this, obj);
+        for (const subreq of this.subreqs)
+            obj = subreq.apply_patch(patch_type, obj);
+        for (const add of this.additions)
+            obj = add.apply_patch(patch_type, obj);
+        return obj;
     }
 
     update(dict) {
@@ -101,6 +118,7 @@ export default class TayiWPReq {
                 return false;
             answer.add_subreq(s);
         }
+        answer.patches = this.patches;
         return answer;
     }
 }

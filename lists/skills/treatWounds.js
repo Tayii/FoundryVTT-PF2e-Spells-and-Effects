@@ -4,79 +4,45 @@ import TayiWPSkillGrade from "../../categories/clSkillGrade.js";
 import TayiWPSkillRank from "../../categories/clSkillRank.js";
 import TayiWPReq from "../../src/clReq.js";
 import TayiWPRoll from "../../src/clRoll.js";
+import TayiWPDialogParam from "../../src/clDialogParam.js";
 
 class TayiWPSkillGradeTreatWounds extends TayiWPSkillGrade {
-    formula = '1d8';
-    meaning = 'healing';
+    BASIC_FORMULA = {
+        0: '1d8',
+        1: '',
+        2: '2d8',
+        3: '4d8'
+    };
+    BASIC_MEANING = {
+        0: 'damage',
+        1: '',
+        2: 'healing',
+        3: 'healing'
+    };
 
     constructor(level) {
         super(level);
-        this.formula = {
-            0: '1d8',
-            1: '',
-            2: '2d8',
-            3: '4d8'
-        }[level];
-        this.meaning = {
-            0: 'damage',
-            1: '',
-            2: 'healing',
-            3: 'healing'
-        }[level];
-    }
-
-    createParams(grade_num) {
-        const grade = TayiWPConst.GRADE_NAMES[grade_num];
-        const gr = TayiWPConst.GRADE_SH_NAMES[grade_num];
-        return [
-            TayiWPConst.createParam(`formula-${gr}`, grade, 'text', this.formula),
-            TayiWPConst.createOptionParam(`meaning-${gr}`, '', [
-                ['healing', 'healing'],
-                ['damage', 'damage']
-            ], (this.meaning === 'healing') ? 0 : 1),
-        ]
+        this.addParam(new TayiWPDialogParam('formula', "Dice roll", "text", this.BASIC_FORMULA[level]));
+        const meaning = new TayiWPDialogParam('meaning', "", "options");
+        for (const m of ['damage', 'healing']) {
+            meaning.addOptionValue(m, m, m === this.BASIC_MEANING[level]);
+        }
+        this.addParam(meaning);
+        this.spliceParams();
     }
 }
 
 class TayiWPSkillRankTreatWounds extends TayiWPSkillRank {
-    dc = 15;
-    healing_add = 0;
-    formula = '1d8';
-    meaning = 'healing';
-
     constructor(level) {
         super(level);
-        if (level > 1) {
-            this.dc = 10 * level;
-            this.healing_add = 20 * level - 30;
-        }
+        this.addParam(new TayiWPDialogParam('dc', "DC", "number", (level > 1) ? 10 * level : 15));
+        const healing_add = (level > 1) ? 20 * level - 30 : 0;
         for (let i = 3; i >= 0; i--) {
-            const grade = new TayiWPSkillGradeTreatWounds(i);
-            if (grade.meaning === 'healing' && this.healing_add > 0)
-                grade.formula += `+${this.healing_add}`;
+            const grade = new TayiWPSkillGradeTreatWounds(i).spliceParams();
+            if (grade.meaning === 'healing' && healing_add > 0)
+                grade.setParam("formula", grade.formula + `+${healing_add}`);
             this.grades[i] = grade;
         }
-    }
-
-    createParams() {
-        let params = [
-            TayiWPConst.createParam('dc', 'DC', 'number', this.dc)
-        ];
-        for (let i = 3; i >= 0; i--)
-            params = params.concat(this.grades[i].createParams(i));
-        return params;
-    }
-
-    setGrade(grade) {
-        while (grade >= 0 && !this.grades.hasOwnProperty(grade))
-            grade--;
-        if (this.grades.hasOwnProperty(grade)) {
-            grade = this.grades[grade];
-            this.formula = grade.formula;
-            this.meaning = grade.meaning;
-            return true;
-        }
-        return false;
     }
 }
 
@@ -85,28 +51,54 @@ export default class TayiWPSkillTreatWounds extends TayiWPSkill {
     static SUBCLASS_NAME = 'Treat Wounds';
     static USE_REQUIREMENTS = [
         new TayiWPReq("SKILL", "medicine", 1),
-        new TayiWPReq("SKILL", "nature", 1).add_subreq(
-            new TayiWPReq("FEAT", "Natural Medicine")
-        )
+        new TayiWPReq("SKILL", "nature", 1).update({
+            "subreqs": [
+                new TayiWPReq("FEAT", "Natural Medicine").update({
+                    "patches": {
+                        "mods": (req, mods) => {
+                            mods.push(new PF2Modifier(req.name, 2, "circumstance"));
+                            return mods;
+                        }
+                    }
+                })
+            ]
+        })
     ];
     static USE_ADDITIONS = [
-        // new TayiWPReq("FEAT", "Risky Surgery").add_subreq(
-        //     new TayiWPReq("SKILL", "medicine", 1)
-        // )
+        new TayiWPReq("FEAT", "Risky Surgery").update({
+            "subreqs": [
+                new TayiWPReq("SKILL", "medicine", 1)
+            ],
+            "patches": {
+                "rank": (req, rank) => {
+                    rank.params = [
+                        new TayiWPDialogParam(req.getHandlerName(), "Slashing damage", "text", "1d8")
+                    ].concat(rank.params);
+                    return rank;
+                },
+                "mods": (req, mods) => {
+                    mods.push(new PF2Modifier(req.name, 2, "circumstance"));
+                    return mods;
+                }
+            }
+        })
     ];
 
     static getDialogOptionPerLevel(level) {
         return new TayiWPSkillRankTreatWounds(level);
     }
 
-    async dialogCallback(req, additions, dialogParams) {
+    async dialogCallback(req, dialogParams) {
         const actor = TayiWPConst.ifActor();
-        const actionDC = parseInt(dialogParams.dc);
-        const modifiers = [];
-        if (req.find_subreq("FEAT", "Natural Medicine"))
-            modifiers.push(new PF2Modifier("Natural Medicine", 2, "circumstance"));
+        let modifiers = req.apply_patch("mods", []);
         new TayiWPRoll().skillRoll(actor, req.code, modifiers, async (roll) => {
-            roll.vsDC(actionDC);
+            roll.vsDC(dialogParams.dc);
+            if (req.find_add("Risky Surgery") && roll.grade === 2) {
+                const a = req.find_add("Risky Surgery");
+                a.roll = new TayiWPRoll(dialogParams[a.getHandlerName()]).roll({});
+                await a.roll.result.toMessage();
+                roll.grade = 3;
+            }
             const prof = TayiWPConst.RANK_NAMES[dialogParams.level];
             const messageContent = `proficiency level <b>${prof}</b>, ${roll.toString()}`;
             await TayiWPConst.saySomething(actor, `${dialogParams.MACRO_NAME}: ${messageContent}`);
@@ -116,8 +108,12 @@ export default class TayiWPSkillTreatWounds extends TayiWPSkill {
             const roll2 = new TayiWPRoll(dialogParams.formula).roll({});
             await roll2.result.toMessage();
             await TayiWPConst.forEachTargetedToken(async (owner_actor, target_actor, target_token, dialogParams) => {
-                const messageContent = `target <b>${target_token.data.name}</b> receives <b>${roll2.result.total}`
-                    + `</b> ${dialogParams.meaning}`;
+                let messageContent = `target <b>${target_token.data.name}</b> receives `;
+                if (req.find_add("Risky Surgery")) {
+                    const a = req.find_add("Risky Surgery");
+                    messageContent += `<b>${a.roll.result.total}</b> slashing damage, then `;
+                }
+                messageContent += `<b>${roll2.result.total}</b> ${dialogParams.meaning}`;
                 await TayiWPConst.saySomething(owner_actor, `${dialogParams.MACRO_NAME}: ${messageContent}`);
             }, dialogParams);
         });

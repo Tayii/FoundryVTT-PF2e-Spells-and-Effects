@@ -4,22 +4,17 @@ import TayiWPSpellLevel from "../../categories/clSpellLevel.js";
 import TayiWP from "../../src/base.js";
 import TayiWPFlagsClass from "../../src/clFlags.js";
 import TayiWPReq from "../../src/clReq.js";
+import TayiWPDialogParam from "../../src/clDialogParam.js";
 
 class TayiWPSpellAttributesLayOnHands extends TayiWPSpellLevel {
-    spell_target = 'ally';
-    ac_bonus = 2;
-    ac_penalty = 2;
-
-    createParams() {
-        return [
-            TayiWPConst.createOptionParam('spell_target', 'Spell target?', [
-                ['ally', 'Willing Ally (living)'],
-                ['undead', 'Undead']
-            ]),
-            TayiWPConst.createParam('ac_bonus', 'AC Bonus', 'number', this.ac_bonus),
-            TayiWPConst.createParam('ac_penalty', 'AC Penalty', 'number', this.ac_penalty),
-        ]
-    }
+    params = [
+        new TayiWPDialogParam('spell_target', 'Spell target', "options", [
+            ['ally', 'Willing Ally (living)'],
+            ['undead', 'Undead']
+        ]),
+        new TayiWPDialogParam('ac_bonus', 'AC Bonus', 'number', 2),
+        new TayiWPDialogParam('ac_penalty', 'AC Penalty', 'number', 2)
+    ];
 }
 
 export default class TayiWPSpellLayOnHands extends TayiWPSpell {
@@ -49,10 +44,10 @@ export default class TayiWPSpellLayOnHands extends TayiWPSpell {
         }
     }
 
-    async dialogCallback(req, additions, dialogParams) {
+    async dialogCallback(req, dialogParams) {
         let name = dialogParams.SUBCLASS_NAME;
         if (dialogParams.spell_target === 'ally')
-            name += ' (' + dialogParams.spell_target + ')';
+            name += ` (${dialogParams.spell_target})`;
         await TayiWPSpell.findActorItem(name).roll();
         switch (dialogParams.spell_target) {
             case 'ally':
