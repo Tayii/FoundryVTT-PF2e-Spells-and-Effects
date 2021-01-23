@@ -114,6 +114,13 @@ export default class TayiWPConst {
         return false;
     }
 
+    static ifTarget() {
+        const haveTargets = (game.user.targets.size > 0);
+        if (!haveTargets)
+            ui.notifications.error("You must have at least one target.");
+        return haveTargets;
+    }
+
     static async forEachControlledToken(applyFunc, funcArgs) {
         const tokens = canvas.tokens.controlled;
         for (let tokenNum in tokens) {

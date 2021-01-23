@@ -53,9 +53,6 @@ export default class TayiWPSpellKiRush extends TayiWPSpell {
 
     async removeEffect(dialogParams) {
         await TayiWPConst.forEachAffectedToken(async (current_actor, actor, token, dialogParams) => {
-            // const concealed = actor.data.items
-            //     .filter(item => item.type === 'condition')
-            //     .find(concealed => concealed.name === dialogParams.conditionName);
             await token.toggleEffect("systems/pf2e/icons/spells/ki-rush.jpg", {
                 "active": false
             });

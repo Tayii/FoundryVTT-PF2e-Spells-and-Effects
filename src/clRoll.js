@@ -54,9 +54,13 @@ export default class TayiWPRoll {
         return this;
     }
 
-    toString() {
+    toString(show_dc = true) {
+        if (show_dc)
+            show_dc = ` <b>[[${this.DC}]]</b>`;
+        else
+            show_dc = ``;
         if (this.grade !== null) {
-            return `rolled <b>[[${this.result.result}]]</b> vs DC <b>[[${this.DC}]]</b> `
+            return `rolled <b>[[${this.result.result}]]</b> vs DC${show_dc}`
                 + ` which is <b>${TayiWPConst.GRADE_NAMES[this.grade]}</b>`;
         }
         if (this.result !== null) {

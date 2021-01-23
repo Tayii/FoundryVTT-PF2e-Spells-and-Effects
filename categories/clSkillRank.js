@@ -1,4 +1,5 @@
 import TayiWPDialogLevel from "../src/clDialogLevel.js";
+import TayiWPConst from "../src/const.js";
 
 export default class TayiWPSkillRank extends TayiWPDialogLevel {
     grades = {};
@@ -44,5 +45,19 @@ export default class TayiWPSkillRank extends TayiWPDialogLevel {
             }
         }
         return this;
+    }
+
+    static setGrade(obj, grade) {
+        if (!obj.grades.hasOwnProperty(grade))
+            return obj;
+        const grade_obj = obj.grades[grade];
+        const grade_name = TayiWPConst.GRADE_SH_NAMES[grade];
+        for (const pname in grade_obj) {
+            if (grade_obj.hasOwnProperty(pname) && pname.endsWith(`-${grade_name}`)) {
+                const pname_orig = pname.substr(0, pname.length-grade_name.length-1);
+                obj[pname_orig] = grade_obj[pname];
+            }
+        }
+        return obj;
     }
 }

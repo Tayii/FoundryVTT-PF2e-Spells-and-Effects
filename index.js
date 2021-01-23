@@ -1,5 +1,6 @@
 import TAYIWP_SPELLS from './lists/spells.js';
 import TAYIWP_SKILLS from './lists/skills.js';
+import TAYIWP_FEATS from './lists/feats.js';
 
 import TayiWP from "./src/base.js";
 
@@ -16,7 +17,13 @@ Hooks.on("ready", function() {
             continue;
         TayiWP.registerCallback(TAYIWP_SKILLS[name]);
     }
+    for (const name in TAYIWP_FEATS) {
+        if (!TAYIWP_FEATS.hasOwnProperty(name))
+            continue;
+        TayiWP.registerCallback(TAYIWP_FEATS[name]);
+    }
     globalThis.TayiWP = TayiWP;
     globalThis.TAYIWP_SPELLS = TAYIWP_SPELLS;
     globalThis.TAYIWP_SKILLS = TAYIWP_SKILLS;
+    globalThis.TAYIWP_FEATS = TAYIWP_FEATS;
 });
